@@ -27,28 +27,56 @@ public:
         ataqueEspecial = 0;
     }
 
-
-    void Tanque()
-    {
-        vida = vida * 2;
-        defensa = 30;
-        velocidad = 100;
-        ataque = 15;
-        ataqueEspecial;
-    }
 };
 
 
+class Tanque
+{
+private:
+    int vida;
+    int defensa;
+    int velocidad;
+    int ataque;
+    int ataqueEspecial;
+
+
+public:
+    Tanque()
+    {
+        vida = 250;
+        defensa = 30;
+        velocidad = 100;
+        ataque = 15;
+        ataqueEspecial = 30;
+    }
+
+
+
+};
 
 class enemigo
 {
 private:
+    int vida;
+    int ataque;
+    int defensa;
+    int velocidad;
+    int ataqueEspecial;
+
     std::string nombreEnemigo;
     vector<string> NombresPosiblesEnemigo = { "Orco", "Goblin", "Esqueleto", "Troll", "Bandido", "Lobo" };
-
-
-
+public:
+    enemigo()
+    {
+         vida = 0;
+         ataque = 0;
+         defensa = 0;
+         velocidad = 0;
+         ataqueEspecial = 0;
+    }
 };
+
+
 class arma
 {
 private:

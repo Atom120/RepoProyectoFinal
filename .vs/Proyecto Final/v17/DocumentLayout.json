@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Cleve\\OneDrive\\Escritorio\\no borrar pls\\POO\\RepoProycetoFinal\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9412939D-AF28-46EB-989A-8F3251C9CAE6}|Proyecto Final\\Proyecto Final.vcxproj|C:\\Users\\Cleve\\OneDrive\\Escritorio\\no borrar pls\\POO\\RepoProycetoFinal\\Proyecto Final\\Proyecto Final.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{9412939D-AF28-46EB-989A-8F3251C9CAE6}|Proyecto Final\\Proyecto Final.vcxproj|solutionrelative:Proyecto Final\\Proyecto Final.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,8 +14,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Proyecto Final.cpp",
+              "DocumentMoniker": "C:\\Users\\Cleve\\OneDrive\\Escritorio\\no borrar pls\\POO\\RepoProycetoFinal\\Proyecto Final\\Proyecto Final.cpp",
+              "RelativeDocumentMoniker": "Proyecto Final\\Proyecto Final.cpp",
+              "ToolTip": "C:\\Users\\Cleve\\OneDrive\\Escritorio\\no borrar pls\\POO\\RepoProycetoFinal\\Proyecto Final\\Proyecto Final.cpp",
+              "RelativeToolTip": "Proyecto Final\\Proyecto Final.cpp",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAADQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-04-24T20:34:26.863Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
