@@ -38,7 +38,7 @@ private:
     int velocidad;
     int ataque;
     int ataqueEspecial;
-
+    int opcion;
 
 public:
     Tanque()
@@ -50,7 +50,45 @@ public:
         ataqueEspecial = 30;
     }
 
+    void Combate()
+    {
+        std::cout << "Que quieres hacer " << std::endl;
+        std::cout << "1.Objetos " << std::endl << "2.Habilidades" << std::endl << "3.Ataque basico" << std::endl;
+        std::cin >> opcion;
+        switch (opcion)
+        {
 
+        case1:
+            std::cout << "--Objetos--";
+            
+            break;
+
+        default:
+            std::cout << "Opcion invalida " << std::endl;
+            break;
+        }
+    }
+};
+
+class Mago
+{
+private:
+    int vida;
+    int defensa;
+    int velocidad;
+    int ataque;
+    int ataqueEspecial;
+
+
+public:
+    Mago()
+    {
+        vida = 100;
+        defensa = 0;
+        velocidad = 120;
+        ataque = 45;
+        ataqueEspecial = 60;
+    }
 
 };
 
