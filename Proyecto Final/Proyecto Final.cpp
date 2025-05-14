@@ -100,25 +100,46 @@ public:
     }
 
     void atacar(Personaje& objetivo) {
+
         int critico = AleatorizarEstadisticas(1, 100);
-        int danio = ataque;
-
-        if (critico > 20) {
-            danio *= 2;
-            std::cout << "DAÑO CRÍTICO: " << danio << std::endl;
-            objetivo.setVida(objetivo.getVida() - danio);
-            danio -= objetivo.getDefensa();
-            cout << "Ha causado " << danio << " a " << objetivo.getNombre() << endl;
-        }
-        else
-        {
-            objetivo.setVida(objetivo.getVida() - danio);
-            danio -= objetivo.getDefensa();
-
-            std::cout << std::endl << nombre << " ha atacado a " << objetivo.getNombre()
-                << " causando " << danio << " de daño.\n";
-        }
+        int danio = ataque - objetivo.getDefensa();
         if (danio < 0) danio = 0;
+
+        bool esCritico = false;
+
+        if (critico >= 95) {
+            danio *= 2;
+            std::cout << "DAÑO CRÍTICO: " << danio << std::endl << endl;
+            esCritico = true;
+        }
+
+        objetivo.setVida(objetivo.getVida() - danio);
+        if (esCritico)
+        {
+            std::cout << nombre << " ha atacado a " << objetivo.getNombre()
+                << " causando " << danio << " ¡Daño Critico!.\n" << endl;
+        }
+        else {
+            std::cout << nombre << " ha atacado a " << objetivo.getNombre()
+                << " causando " << danio << " daño.\n" << endl;
+        }
+    }
+
+    void elecciónJugador()
+    {
+        int opcion;
+
+        switch (opcion)
+        {
+        case 1:
+
+
+            break;
+
+        default:
+            break;
+        }
+
     }
 
     int getVida() { return vida; }
@@ -129,25 +150,29 @@ public:
 
 // --- Implementación de ataque después de definir Enemigo ---
 void Personaje::atacar(Enemigo& objetivo) {
-    int critico = AleatorizarEstadisticas(1, 100);
-    int danio = ataque;
 
-    if (critico > 20) {
+     int critico = AleatorizarEstadisticas(1, 100);
+     int danio = ataque - objetivo.getDefensa();
+     if (danio < 0) danio = 0;
+
+     bool esCritico = false;
+
+     if (critico >= 95) {
         danio *= 2;
-        std::cout << "DAÑO CRÍTICO: "<< danio << std::endl;
-        objetivo.setVida(objetivo.getVida() - danio);
-        danio -= objetivo.getDefensa();
-        cout << "Ha causado " << danio << " a " << objetivo.getNombre() << endl;
-    }
-    else
-    {
-        objetivo.setVida(objetivo.getVida() - danio);
-        danio -= objetivo.getDefensa();
+        std::cout << "DAÑO CRÍTICO: " << danio << std::endl << endl;
+        esCritico = true;
+     }
 
-        std::cout << std::endl << nombre << " ha atacado a " << objetivo.getNombre()
-            << " causando " << danio << " de daño.\n";
-    }
-    if (danio < 0) danio = 0;  
+     objetivo.setVida(objetivo.getVida() - danio);
+     if (esCritico)
+     {
+         std::cout << nombre << " ha atacado a " << objetivo.getNombre()
+             << " causando " << danio << " ¡Daño Critico!.\n" << endl;
+     }
+     else {
+         std::cout << nombre << " ha atacado a " << objetivo.getNombre()
+             << " causando " << danio << " daño.\n" << endl;
+     }
 }
 
 int main() {
