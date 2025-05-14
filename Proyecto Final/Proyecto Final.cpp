@@ -1,95 +1,193 @@
-// Sistema de combate por turnos en C++ estándar
+// CombateP00.cpp : Este archivo contiene la función "main". La ejecución del programa comienza y termina ahí.
+// Sebastián Selvas García
+
 #include <iostream>
-#include <vector>
-#include <string>
-#include <map>
-#include <cstdlib>
-#include <ctime>
+#include <stdlib.h>   // para usar rand
+#include <locale.h>   // Para poder cambiar el idioma y usar ñ
+#include <time.h>
 
 using namespace std;
+// --- Declaración adelantada necesaria ---
+class Enemigo;
 
-// Clase que representa un personaje en el combate
 class Personaje {
-public:
-    // Atributos: nombre, vida (HP) y ataque (daño fijo)
-    string nombre;
+private:
     int vida;
+    int defensa;
     int ataque;
-    int ataqueCritico;
+    int ataqueRecibido;
+    int critico;
 
-    // Constructor que inicializa los atributos del personaje
-    Personaje(string n, int v, int a) : nombre(n), vida(v), ataque(a) {}
+public:
+    std::string nombre;
 
-    // Verifica si el personaje sigue vivo
-    bool estaVivo() {
-        return vida > 0;
+    Personaje() {
+        vida = AleatorizarEstadisticas(150, 200);
+        defensa = AleatorizarEstadisticas(5, 20);
+        ataque = AleatorizarEstadisticas(50, 100);
     }
 
-    int ataque(Personaje &Danio)
-    {
-        ataqueCritico= rand() % 100;
+    Personaje(int Vmin_, int Vmax_, int Dmin_, int Dmax_, int Amin_, int Amax_) {//Se va ausar para el equipo
+        vida = AleatorizarEstadisticas(Vmin_, Vmax_);
+        defensa = AleatorizarEstadisticas(Dmin_, Dmax_);
+        ataque = AleatorizarEstadisticas(Amin_, Amax_);
     }
 
-
-    // Función para atacar a otro personaje
-    void atacar(Personaje& objetivo) { //Personaje se llama a si mismo para poder saber que información. Es el Consultor.  
-        //Objetivo es el nombre para poder usarlo(La variable tipo personaje)
-        // & Se usa para hacer una refrencia directa. Para poder modificarlo afuera de la clase
-        
-        // Mostrar mensaje del ataque
-        cout << nombre << " ataca a " << objetivo.nombre << " causando " << ataque << " de daño.\n";
-
-        // Restar el ataque a la vida del objetivo
-        objetivo.vida -= ataque;
-
-        // Prevenir que la vida quede en negativo
-        if (objetivo.vida < 0) objetivo.vida = 0;
-
-        // Mostrar vida restante del objetivo
-        cout << objetivo.nombre << " ahora tiene " << objetivo.vida << " de vida.\n\n";
+    int AleatorizarEstadisticas(int _minimo, int _maximo) {
+        return _minimo + rand() % (_maximo - _minimo + 1);
     }
 
+    void pedirNombre() {
+        std::cout << "Ingrese el nombre del peleador" << std::endl;
+        std::cin >> nombre;
+        system("cls");
+    }
+
+    void MostrarStats() {
+        std::cout << "\n---- Estado actual del jugador ----" << std::endl;
+        std::cout << "Nombre: " << nombre << std::endl;
+        std::cout << "Vida: " << vida << std::endl;
+        std::cout << "Defensa: " << defensa << std::endl;
+        std::cout << "Ataque: " << ataque << std::endl;
+    }
+
+    void atacar(Enemigo& objetivo);//Porotipo declarado en Enemigo. Si la declaramos aun no conoce al objetivo
+
+    int getVida() { return vida; }
+    void setVida(int _vida) { vida = _vida; }
+    int getDefensa() { return defensa; }
+    std::string getNombre() { return nombre; }
 };
 
-int main() {
-    // Inicializar generador aleatorio con la hora actual
-    srand(time(0));
+// --- Clase Enemigo completa ---
+class Enemigo {
+private:
+    int vida;
+    int defensa;
+    int ataque;
 
-    // Crear los personajes usando el constructor
-    Personaje jugador("Jugador", 100, 20);
-    Personaje enemigo("Enemigo", 80, 15);
+public:
+    std::string nombre;
 
-    int turno = 1;
-
-    cout << "¡Comienza el combate!\n\n";
-
-    // Bucle que continúa mientras ambos personajes estén vivos
-    while (jugador.estaVivo() && enemigo.estaVivo()) {
-        cout << "Turno " << turno << ":\n";
-
-        // Turno del jugador
-        jugador.atacar(enemigo);
-        if (!enemigo.estaVivo()) break;  // Salir si el enemigo muere
-
-        // Turno del enemigo
-        enemigo.atacar(jugador);
-        if (!jugador.estaVivo()) break;  // Salir si el jugador muere
-
-        turno++;
-        system("Pause");
-        cout << "\n";
+    Enemigo() {
+        vida = AleatorizarEstadisticas(150, 200);
+        defensa = AleatorizarEstadisticas(5, 20);
+        ataque = AleatorizarEstadisticas(50, 55);
     }
 
-    system("Pause");
+    Enemigo(int Vmin_, int Vmax_,int Dmin_, int Dmax_,int Amin_, int Amax_) {//Se va ausar para el equipo
+        vida = AleatorizarEstadisticas(Vmin_, Vmax_);
+        defensa = AleatorizarEstadisticas(Dmin_, Dmax_);
+        ataque = AleatorizarEstadisticas(Amin_, Amax_);
+    }
 
-    // Mostrar resultado final
-    cout << "Fin del combate.\n";
-    if (jugador.estaVivo()) {
-        cout << jugador.nombre << " ha ganado.\n";
+    int AleatorizarEstadisticas(int _minimo, int _maximo) {
+        return _minimo + rand() % (_maximo - _minimo + 1);
+    }
+
+    void pedirNombre() {
+        std::cout << "Ingrese el nombre del peleador" << std::endl;
+        std::cin >> nombre;
+        system("cls");
+    }
+
+    void MostrarStats() {
+        std::cout << "\n---- Estado actual del enemigo ----" << std::endl;
+        std::cout << "Nombre: " << nombre << std::endl;
+        std::cout << "Vida: " << vida << std::endl;
+        std::cout << "Defensa: " << defensa << std::endl;
+        std::cout << "Ataque: " << ataque << std::endl << std::endl;
+    }
+
+    void atacar(Personaje& objetivo) {
+        int critico = AleatorizarEstadisticas(1, 100);
+        int danio = ataque;
+
+        if (critico > 20) {
+            danio *= 2;
+            std::cout << "DAÑO CRÍTICO: " << danio << std::endl;
+            objetivo.setVida(objetivo.getVida() - danio);
+            danio -= objetivo.getDefensa();
+            cout << "Ha causado " << danio << " a " << objetivo.getNombre() << endl;
+        }
+        else
+        {
+            objetivo.setVida(objetivo.getVida() - danio);
+            danio -= objetivo.getDefensa();
+
+            std::cout << std::endl << nombre << " ha atacado a " << objetivo.getNombre()
+                << " causando " << danio << " de daño.\n";
+        }
+        if (danio < 0) danio = 0;
+    }
+
+    int getVida() { return vida; }
+    void setVida(int _vida) { vida = _vida; }
+    int getDefensa() { return defensa; }
+    std::string getNombre() { return nombre; }
+};
+
+// --- Implementación de ataque después de definir Enemigo ---
+void Personaje::atacar(Enemigo& objetivo) {
+    int critico = AleatorizarEstadisticas(1, 100);
+    int danio = ataque;
+
+    if (critico > 20) {
+        danio *= 2;
+        std::cout << "DAÑO CRÍTICO: "<< danio << std::endl;
+        objetivo.setVida(objetivo.getVida() - danio);
+        danio -= objetivo.getDefensa();
+        cout << "Ha causado " << danio << " a " << objetivo.getNombre() << endl;
+    }
+    else
+    {
+        objetivo.setVida(objetivo.getVida() - danio);
+        danio -= objetivo.getDefensa();
+
+        std::cout << std::endl << nombre << " ha atacado a " << objetivo.getNombre()
+            << " causando " << danio << " de daño.\n";
+    }
+    if (danio < 0) danio = 0;  
+}
+
+int main() {
+    srand(time(0)); // Inicializar la semilla aleatoria solo una vez
+    std::locale::global(std::locale("es_ES.UTF-8")); // Para ñ y acentos
+
+    Personaje jugador;
+    Enemigo enemigo;
+
+    jugador.pedirNombre();
+    enemigo.pedirNombre();
+
+    int i = 0;
+    do {
+        i += 1;
+        std::cout << "----Turno " << i << "----" << std::endl;
+
+        jugador.MostrarStats();
+        enemigo.MostrarStats();
+        jugador.atacar(enemigo);
+        enemigo.atacar(jugador);
+
+        system("pause");
+        system("cls");
+
+      
+    } while (jugador.getVida() > 0 && enemigo.getVida() > 0);
+
+    std::cout << std::endl << "¡Fin del combate!";
+
+    if (jugador.getVida() <= 0 && enemigo.getVida() > 0) {
+        std::cout << "\n¡" << enemigo.nombre << " ha ganado el combate!" << std::endl;
+    }
+    else if (enemigo.getVida() <= 0 && jugador.getVida() > 0) {
+        std::cout << "\n¡" << jugador.nombre << " ha ganado el combate!" << std::endl;
     }
     else {
-        cout << enemigo.nombre << " ha ganado.\n";
+        std::cout << "\n¡Empate! Ambos han caído." << std::endl;
     }
+
 
     return 0;
 }
