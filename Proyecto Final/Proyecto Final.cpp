@@ -22,7 +22,6 @@ protected:
     int defensa;
     int ataque;
     int velocidad;
-    int peso;
 
 public:
     std::string nombre;
@@ -54,19 +53,12 @@ public:
 
     }
 
-    void hablidiades()
-    {
-        int opcion;
-
-        cout << "Que habilidad quiere usar?";
-        cin >> opcion;
-    }
+    void habilidades(Enemigo& objetivo);
 
     void eleccionJugador(Personaje& jugador, Enemigo& enemigo);
 
     void atacar(Enemigo& objetivo);
 
-    int getPeso() { return peso; }
     int getVida() { return vida; }
     void setVida(int _vida) { vida = _vida; }
     int getDefensa() { return defensa; }
@@ -83,7 +75,6 @@ private:
     int defensa;
     int ataque;
     int velocidad;
-    int peso;
 
 public:
     std::string nombre;
@@ -100,15 +91,32 @@ public:
         return _minimo + rand() % (_maximo - _minimo + 1);
     }
 
+    int calcularDanioConCritico(int min, int max, int probCritico, bool& fueCritico) {
+        int critico = AleatorizarEstadisticas(1, 100);
+        int danio = AleatorizarEstadisticas(min, max);
+
+        if (critico >= probCritico) {
+            fueCritico = true;
+            danio *= 2;//No se guarda para siempre pq recibe un dato externo cada vez y este danio se guarda localmente
+            cout << "¡CRÍTICO!\n";
+        }
+        else {
+            fueCritico = false;
+        }
+
+        if (danio < 0) danio = 0;
+        return danio;
+    }
+
+
     void pedirNombre() {
         std::cout << "Ingrese el nombre del peleador" << std::endl;
         std::cin >> nombre;
         system("cls");
     }
 
-    void MostrarStats() {
-        std::cout << "\n---- Estado actual del jugador ----" << std::endl;
-        std::cout << "Nombre: " << nombre << std::endl;
+    void MostrarStatsAliado(Aliados aliado) {
+        std::cout << "\n---- Estado actual del " << nombre << "----" << std::endl;
         std::cout << "Vida: " << vida << std::endl;
         std::cout << "Defensa: " << defensa << std::endl;
         std::cout << "Ataque: " << ataque << std::endl;
@@ -116,23 +124,30 @@ public:
 
     }
 
-    void hablidiades()
-    {
-        int opcion;
-
-        cout << "Que habilidad quiere usar?";
-        cin >> opcion;
-    }
-
     void atacarAliados(Enemigo& objetivo);
 
-    void eleccionAliados(Aliados& _aliados, Enemigo& enemigo);
+    //elecciones
+    void eleccionAliadoMago(Aliados& _aliados, Enemigo& enemigo);
+    void eleccionAliadoTanque(Aliados& _aliados, Enemigo& enemigo);
+    void eleccionAliadoAsesino(Aliados& _aliados, Enemigo& enemigo);
+    void eleccionAliadoSupport(Aliados& _aliados, Enemigo& enemigo);
 
-    int getPeso() { return peso; }
+    //Habilidades
+    void habilidadesMago(Enemigo& objetivo);
+    void habilidadesTanque(Enemigo& objetivo);
+    void habilidadesAsesino(Enemigo& objetivo);
+    void habilidadesSupport(Enemigo& objetivo);
+
+    //getters y setters
     int getVida() { return vida; }
     void setVida(int _vida) { vida = _vida; }
+
     int getDefensa() { return defensa; }
+    int setDefensa(int _defensa) { defensa = _defensa; }
+
     int getVelocidad() { return velocidad; }
+    int setVelocidad(int _velocidad) { velocidad = _velocidad; }
+
     std::string getNombre() { return nombre; }
 
 };
@@ -313,10 +328,173 @@ public:
     std::string getNombre() { return nombre; }
 };
 
+class Jugador
+{
+private:
+    string nombreJugador;
+    int oroJugador;
+
+
+
+public:
+    Jugador() //constructor
+    {
+        nombreJugador = "Lonki";   //nombre de el jugador al entrar en la tienda
+        oroJugador = 200;   //cantidad de oro con la que empezamos       
+    }
+    void funcMostrarInfoJugador()
+    {
+        cout << "Nombre: " << nombreJugador << endl << "Oro inicial: " << oroJugador << endl;
+    }
+
+    int getoroJugador()
+    {
+        return oroJugador;
+    }
+
+    int setRestaroroJugador(int paramCantidadoro)
+    {
+        oroJugador -= paramCantidadoro;
+        return oroJugador;
+    }
+
+};
+//Pocion --> Objeto
+class Pocion
+{
+private:
+    int cantidadPocion;
+    int precioPocion;
+    int nivelPocion;
+    string descripcionEfectoPocion;
+    string nombrePocion;
+
+public:
+    //Constructor pocion
+    Pocion(int _cantidadPocion, int _precioPocion, int _nivelPocion, string _descripcionEfectoPocion, string _nombrePocion)
+    {
+        cantidadPocion = _cantidadPocion;
+        precioPocion = _precioPocion;
+        nivelPocion = _nivelPocion;
+        descripcionEfectoPocion = _descripcionEfectoPocion;
+        nombrePocion = _nombrePocion;
+    }
+
+    void funcMostrarInfoPocion()
+    {
+        cout << "Nombre: " << nombrePocion << ", Precio: " << precioPocion << endl << "Descripcion: " << descripcionEfectoPocion << endl << "Nivel: " << nivelPocion << endl;
+    }
+
+    string getNombrePocion()//para poder recuperar el nombre de la pocion
+    {
+        return nombrePocion;
+    }
+
+    int getprecioPocion()
+    {
+        return precioPocion;
+    }
+
+
+};
+
+//Tienda --> objeto
+class Tienda
+{
+private:
+    vector<Pocion> listaPociones;
+
+public:
+    //Constructor de tienda
+    Tienda()
+    {
+        //Constructor pocion(int _cantidadPocion, int _precioPocion, int _nivelPocion, string _descripcionEfectoPocion, string _nombrePocion)
+        listaPociones.push_back(Pocion(3, 50, 2, "Restaura 50 puntos de vida ", "Pocion de vida"));
+        listaPociones.push_back(Pocion(8, 100, 5, "Restaura 40 puntos de mana ", "Pocion de mana"));
+        listaPociones.push_back(Pocion(2, 150, 10, "Restaura 100 puntos de vida ", "Elixir mayor de vida"));
+        listaPociones.push_back(Pocion(5, 200, 15, "Restaura 80 puntos de mana ", "Elixir mayor de mana"));
+
+    }
+
+    void funcMostrarMenu()
+    {
+        cout << "-----Bienvenido a la tienda de pociones-----" << endl;
+        cout << "Seleccione un numero del menu" << endl << endl;
+        for (size_t i = 0; i < listaPociones.size(); i++)// listaPociones.size() (Recorre posiciones del num de vectores)
+        {
+            cout << i + 1 << ".- ";
+            listaPociones[i].funcMostrarInfoPocion();
+        }
+        cout << listaPociones.size() + 1 << ".-Salir de menu";
+
+    }
+
+    int funcComprarPocion(Jugador paramJugador)//parametros de jugador
+    {
+        int opcionSeleccionada;
+
+        do
+        {
+            funcMostrarMenu();
+            cout << endl;
+            cin >> opcionSeleccionada;
+
+            switch (opcionSeleccionada)
+            {
+            case 1:
+            case 2:
+            case 3:
+            case 4: {
+                int pocionListaPociones = opcionSeleccionada - 1;
+                Pocion pocionSeleccionada = listaPociones[pocionListaPociones];//Para que busque pocion selecciono el jugador
+
+                if (paramJugador.getoroJugador() >= pocionSeleccionada.getprecioPocion())//Compara el oro que tiene el jugador con el precio de la pocion que selecciono
+                {
+                    paramJugador.setRestaroroJugador(pocionSeleccionada.getprecioPocion());//Se llama a la pocion seleccionada llmando al precio para saber cuanto restarle
+                    cout << endl << "Haz comprado: " << pocionSeleccionada.getNombrePocion() << endl;//Le muestra que pocion selecciono
+                    cout << "Te queda: " << paramJugador.getoroJugador() << endl << endl;//Llama al get de oror para saber cuanto le queda al jugaor
+                    break;
+                }
+                else
+                {
+                    if (paramJugador.getoroJugador() < pocionSeleccionada.getprecioPocion())
+                    {
+                        cout << "No te alcanza" << endl << endl;
+                        cout << "Te queda: " << paramJugador.getoroJugador() << endl << endl;
+                    }
+                    else
+                    {
+                        cout << "No tienes dinero" << endl << endl;
+                    }
+                }
+
+            }
+
+                  break;
+            default:
+                if (listaPociones.size() + 1 == opcionSeleccionada)
+                {
+                    break;
+                }
+                else
+                {
+                    cout << "Error en algo" << endl << endl;
+                }
+
+            }
+
+        } while (opcionSeleccionada != listaPociones.size() + 1);
+
+        return 0;
+    }
+
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Aliados
 
-void Aliados::eleccionAliados(Aliados& _aliados, Enemigo& enemigo)
+//Elecciones
+void Aliados::eleccionAliadoMago(Aliados& _aliados, Enemigo& enemigo)
 {
     int opcion;
 
@@ -324,7 +502,7 @@ void Aliados::eleccionAliados(Aliados& _aliados, Enemigo& enemigo)
 
     std::cout << "\n--- Elige una acción ---\n";
     std::cout << "1. Atacar\n";
-    std::cout << "2. Usar habilidad (en desarrollo)\n";
+    std::cout << "2. Usar habilidad\n";
     std::cout << "3. Defender (en desarrollo)\n";
     std::cout << "Opción: ";
     std::cin >> opcion;
@@ -334,7 +512,100 @@ void Aliados::eleccionAliados(Aliados& _aliados, Enemigo& enemigo)
         _aliados.atacarAliados(enemigo);
         break;
     case 2:
-        std::cout << _aliados.getNombre() << " intenta usar una habilidad especial (no implementada).\n";
+        std::cout << _aliados.getNombre() << "\n";
+        habilidadesMago(enemigo);
+        break;
+    case 3:
+        std::cout << _aliados.getNombre() << " se defiende (no implementado).\n";
+        break;
+    default:
+        std::cout << "Opción no válida. Pierdes el turno.\n";
+        break;
+    }
+    system("pause");
+    system("cls");
+}
+void Aliados::eleccionAliadoTanque(Aliados& _aliados, Enemigo& enemigo){
+    int opcion;
+
+    cout << "Es el turno de " << _aliados.getNombre() << endl;
+
+    std::cout << "\n--- Elige una acción ---\n";
+    std::cout << "1. Atacar\n";
+    std::cout << "2. Usar habilidad\n";
+    std::cout << "3. Defender (en desarrollo)\n";
+    std::cout << "Opción: ";
+    std::cin >> opcion;
+
+    switch (opcion) {
+    case 1:
+        _aliados.atacarAliados(enemigo);
+        break;
+    case 2:
+        std::cout << _aliados.getNombre() << "\n";
+        habilidadesMago(enemigo);
+        break;
+    case 3:
+        std::cout << _aliados.getNombre() << " se defiende (no implementado).\n";
+        break;
+    default:
+        std::cout << "Opción no válida. Pierdes el turno.\n";
+        break;
+    }
+    system("pause");
+    system("cls");
+}
+void Aliados::eleccionAliadoAsesino(Aliados& _aliados, Enemigo& enemigo)
+{
+    int opcion;
+
+    cout << "Es el turno de " << _aliados.getNombre() << endl;
+
+    std::cout << "\n--- Elige una acción ---\n";
+    std::cout << "1. Atacar\n";
+    std::cout << "2. Usar habilidad\n";
+    std::cout << "3. Defender (en desarrollo)\n";
+    std::cout << "Opción: ";
+    std::cin >> opcion;
+
+    switch (opcion) {
+    case 1:
+        _aliados.atacarAliados(enemigo);
+        break;
+    case 2:
+        std::cout << _aliados.getNombre() << "\n";
+        habilidadesAsesino(enemigo);
+        break;
+    case 3:
+        std::cout << _aliados.getNombre() << " se defiende (no implementado).\n";
+        break;
+    default:
+        std::cout << "Opción no válida. Pierdes el turno.\n";
+        break;
+    }
+    system("pause");
+    system("cls");
+}
+void Aliados::eleccionAliadoSupport(Aliados& _aliados, Enemigo& enemigo)
+{
+    int opcion;
+
+    cout << "Es el turno de " << _aliados.getNombre() << endl;
+
+    std::cout << "\n--- Elige una acción ---\n";
+    std::cout << "1. Atacar\n";
+    std::cout << "2. Usar habilidad\n";
+    std::cout << "3. Defender (en desarrollo)\n";
+    std::cout << "Opción: ";
+    std::cin >> opcion;
+
+    switch (opcion) {
+    case 1:
+        _aliados.atacarAliados(enemigo);
+        break;
+    case 2:
+        std::cout << _aliados.getNombre() << "\n";
+        habilidadesMago(enemigo);
         break;
     case 3:
         std::cout << _aliados.getNombre() << " se defiende (no implementado).\n";
@@ -347,6 +618,7 @@ void Aliados::eleccionAliados(Aliados& _aliados, Enemigo& enemigo)
     system("cls");
 }
 
+//atacar
 void Aliados::atacarAliados(Enemigo& objetivo)
 {
     int critico = AleatorizarEstadisticas(1, 100);
@@ -358,7 +630,7 @@ void Aliados::atacarAliados(Enemigo& objetivo)
     cout << "\n---- Daño Aliados ----\n\n";
 
     if (critico >= 95) {
-        danio *= 2;
+        danio * 2;
         std::cout << "DAÑO CRÍTICO: " << danio << std::endl << endl;
         esCritico = true;
     }
@@ -369,6 +641,212 @@ void Aliados::atacarAliados(Enemigo& objetivo)
     else
         std::cout << nombre << ": ataca a " << objetivo.getNombre() << " causando " << danio << " daño.\n" << std::endl;
 }
+
+//Habilidades
+void Aliados::habilidadesMago(Enemigo& objetivo)
+{
+    int opcion;
+    int danioBase = ataque - objetivo.getDefensa();
+    if (danioBase < 0) danioBase = 0;
+
+    do {
+        cout << "\n¿Qué habilidad quiere usar el Mago?\n";
+        cout << "1. Destructor atómico de los reyes del inframundo interpolados sin fines de lucro\n";
+        cout << "2. Bola de fuego estelar\n";
+        cout << "3. Chanclazo\n";
+        cout << "Opción: ";
+        cin >> opcion;
+
+        switch (opcion)
+        {
+        case 1: {
+            int danioMagico = static_cast<int>(danioBase * 1.5);//static_cast Es un conversor de una variable a otra en este caso a int porque getVida solo recibe enteros
+            objetivo.setVida(objetivo.getVida() - danioMagico);
+            cout << "¡Se lanza el hechizo Destructor atómico de los reyes del inframundo interpolados sin fines de lucro!\n";
+            cout << objetivo.getNombre() << " recibe " << danioMagico << " de daño mágico.\n";
+            break;
+        }
+
+        case 2: {
+            int danioMagico = static_cast<int>(danioBase * 1.7);
+            objetivo.setVida(objetivo.getVida() - danioMagico);
+            cout << "¡Bola de fuego estelar lanzada!\n";
+            cout << objetivo.getNombre() << " recibe " << danioMagico << " de daño mágico.\n";
+            break;
+        }
+
+        case 3: {
+            int danioMagico = danioBase * 2;
+            objetivo.setVida(objetivo.getVida() - danioMagico);
+            cout << "¡Chanclazo infernal ejecutado!\n";
+            cout << objetivo.getNombre() << " recibe " << danioMagico << " de daño mágico.\n";
+            break;
+        }
+
+        default:
+            cout << "Opción no válida. Intente nuevamente.\n";
+            break;
+        }
+
+    } while (opcion < 1 || opcion > 3);
+}
+
+void Aliados::habilidadesTanque(Enemigo& objetivo)
+{
+    int opcion;
+    int danio = ataque - objetivo.getDefensa();
+    if (danio < 0) danio = 0;
+
+    cout << "Que habilidad quiere usar?";
+    cout << "1. Destructor atomico de los reyes del inframundo interpolados sin fines de lucro";
+    cout << "2. Bola de fuego estelar";
+    cout << "3. Chanclazo";
+    cin >> opcion;
+    do
+    {
+        switch (opcion)
+        {
+        case 1:
+            objetivo.setVida(objetivo.getVida() - 10);
+
+            cout << "Se lanza el hehcizo Destructor atomico de los reyes del inframundo interpolados sin fines de lucro";
+            cout << nombre << " recibe " << danio << objetivo.getNombre();
+            break;
+
+        case 2:
+
+            objetivo.setVida(objetivo.getVida() - AleatorizarEstadisticas(45, 55));
+
+            cout << "Bola de fuego estelar";
+            cout << nombre << " recibe " << danio << objetivo.getNombre();
+            break;
+
+        case 3:
+
+            objetivo.setVida(objetivo.getVida() - AleatorizarEstadisticas(99, 100));
+
+            cout << "Chanclazo";
+            cout << nombre << " recibe " << danio << objetivo.getNombre();
+            break;
+
+        default:
+
+            cout << "Opcion no valida";
+            break;
+        }
+    } while (opcion == 1 || opcion == 2 || opcion == 3);
+}
+
+void Aliados::habilidadesAsesino(Enemigo& objetivo)
+{
+    int velA = velocidad;
+    int opcion;
+
+    cout << "\n¿Qué habilidad quiere usar el Asesino?\n";
+    cout << "1. Golpe Sombrío (Alto daño crítico)\n";
+    cout << "2. Doble Corte (Dos golpes rápidos)\n";
+    cout << "3. Desvanecer (Aumenta velocidad)\n";
+    cin >> opcion;
+
+    switch (opcion)
+    {
+    case 1:
+    {
+        //El static_cast Es un conversor de una variable a otra. 
+        //aqui danio al multiplicar 1.5 es float y al ponerle eso la hace un entero
+
+        bool critico;
+        int danio = calcularDanioConCritico(60, 80, 60, critico);
+        danio = static_cast<int>(danio * 1.5);
+        objetivo.setVida(objetivo.getVida() - danio);
+
+        if (critico)//si no pones nada asume q es true
+            cout << "Asesino realiza un ¡GOLPE PODEROSISIMO!\n";
+        else
+            cout << "Asesino realiza un golpe poderoso.\n";
+
+        cout << "Daño total: " << danio << "\n";
+        break;
+    }
+    case 2:
+    {
+        bool critico1, critico2;
+        int golpe1 = calcularDanioConCritico(20, 80, 90, critico1);
+        int golpe2 = calcularDanioConCritico(20, 80, 90, critico2);
+        int danioTotal = golpe1 + golpe2;
+
+        objetivo.setVida(objetivo.getVida() - danioTotal);
+        cout << "El Asesino realiza un Doble Corte!\n";
+                                         //Este es un operador ternario, si critico es tru cumple la primera si no la segunda. solo srive en cout
+        cout << "Corte 1: " << golpe1 << (critico1 ? " (CRÍTICO)\n" : "\n");//condición ? valor_si_verdadero : valor_si_falso;
+
+        cout << "Corte 2: " << golpe2 << (critico2 ? " (CRÍTICO)\n" : "\n");
+
+        cout << "Daño Total: " << danioTotal << "\n";
+        break;
+    }
+    case 3:
+    {
+        int aumento = AleatorizarEstadisticas(1, 10);
+        velA += aumento;
+        velocidad = velA;
+        cout << "El Asesino se desvanece. ¡Su velocidad aumenta durante el combate!\n";
+        cout << "Su velocidad ahora es de: " << velA << "\n";
+        break;
+    }
+    default:
+        cout << "Opción no válida.\n";
+        break;
+    }
+
+}
+
+void Aliados::habilidadesSupport(Enemigo& objetivo)
+{
+    int opcion;
+    int danio = ataque - objetivo.getDefensa();
+    if (danio < 0) danio = 0;
+
+    cout << "Que habilidad quiere usar?";
+    cout << "1. Healing";
+    cout << "2. Bola de fuego estelar";
+    cout << "3. Chanclazo";
+    cin >> opcion;
+    do
+    {
+        switch (opcion)
+        {
+        case 1:
+            objetivo.setVida(objetivo.getVida() - 10);
+
+            cout << "Se lanza el hehcizo Destructor atomico de los reyes del inframundo interpolados sin fines de lucro";
+            cout << nombre << " recibe " << danio << objetivo.getNombre();
+            break;
+
+        case 2:
+
+            objetivo.setVida(objetivo.getVida() - AleatorizarEstadisticas(45, 55));
+
+            cout << "Bola de fuego estelar";
+            cout << nombre << " recibe " << danio << objetivo.getNombre();
+            break;
+
+        case 3:
+
+            objetivo.setVida(objetivo.getVida() - AleatorizarEstadisticas(99, 100));
+
+            cout << "Chanclazo";
+            cout << nombre << " recibe " << danio << objetivo.getNombre();
+            break;
+
+        default:
+
+            cout << "Opcion no valida";
+            break;
+        }
+    } while (opcion == 1 || opcion == 2 || opcion == 3);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Personaje
@@ -384,7 +862,7 @@ void Personaje::atacar(Enemigo& objetivo) {
     cout << "\n---- Daño" << jugador.getNombre() << "----\n\n";
 
     if (critico >= 95) {
-        danio *= 2;
+        danio * 2;
         std::cout << "DAÑO CRÍTICO: " << danio << std::endl << endl;
         esCritico = true;
     }
@@ -399,31 +877,78 @@ void Personaje::atacar(Enemigo& objetivo) {
 void Personaje::eleccionJugador(Personaje& jugador, Enemigo& enemigo) {
     int opcion;
 
-    std::cout << "\n--- Elige una acción ---\n";
-    std::cout << "1. Atacar\n";
-    std::cout << "2. Usar habilidad (en desarrollo)\n";
-    std::cout << "3. Defender (en desarrollo)\n";
-    std::cout << "Opción: ";
-    std::cin >> opcion;
+    do {
+        std::cout << "\n¿Qué desea hacer?\n";
+        std::cout << "1. Atacar\n";
+        std::cout << "2. Habilidad\n";
+        std::cout << "3. Defender\n";
+        cout << "\n¡No ingrese letras o se rompe!\n";
+        std::cout << "Ingrese su opción: ";
+        std::cin >> opcion;
 
-    switch (opcion) {
-    case 1:
-        jugador.atacar(enemigo);
-        break;
-    case 2:
-        std::cout << jugador.getNombre() << " intenta usar una habilidad especial (no implementada).\n";
-        break;
-    case 3:
-        std::cout << jugador.getNombre() << " se defiende (no implementado).\n";
-        break;
-    default:
-        std::cout << "Opción no válida. Pierdes el turno.\n";
-        break;
-    }
-    system("pause");
+        switch (opcion) {
+        case 1:
+            jugador.atacar(enemigo);
+            break;
+        case 2:
+            std::cout << jugador.getNombre() << endl;
+            jugador.habilidades(enemigo);
+            break;
+        case 3:
+            std::cout << jugador.getNombre() << " se defiende (no implementado).\n";
+            break;
+        default:
+            std::cout << "\n\nOpción no válida. Intente de nuevo\n\n";
+            break;
+        }
+
+        system("pause");
+        system("cls");
+    } while (opcion < 1 || opcion > 3);
+
     system("cls");
 }
 
+void Personaje::habilidades(Enemigo& objetivo){
+    int opcion;
+    int danio = ataque - objetivo.getDefensa();
+    if (danio < 0) danio = 0;
+    system("cls");
+
+    do {
+        cout << "\n¿Qué habilidad quiere usar?\n";
+        cout << "1. Destructor atómico\n";
+        cout << "2. Bola de fuego estelar\n";
+        cout << "3. Chanclazo\n";
+        cout << "\n¡No ingrese letras o se rompe:!\n";
+        cout << "Seleccione una opción: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1:
+            objetivo.setVida(objetivo.getVida() - 10);
+            cout << "Se lanza el hechizo Destructor atómico.\n";
+            break;
+
+        case 2:
+            objetivo.setVida(objetivo.getVida() - AleatorizarEstadisticas(45, 55));
+            cout << "Bola de fuego estelar lanzada.\n";
+            break;
+
+        case 3:
+            objetivo.setVida(objetivo.getVida() - AleatorizarEstadisticas(99, 100));
+            cout << "¡Chanclazo certero!\n";
+            break;
+
+        default:
+            cout << "\n\nOpción no válida. Intente de nuevo\n\n";
+            break;
+        }
+        system("pause");
+        system("cls");
+    } while (opcion < 1 || opcion > 3);  // Solo repite si la opción NO es válida
+
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Turnos
 
@@ -447,106 +972,6 @@ string turnoEquipo()
     }
 
     return ordenTurno;
-
-}
-
-
-string turnoAliados(Personaje& _jugador, Aliados _aliadosM, Aliados _aliadosT, Aliados _aliadosA, Aliados _aliadosS)
-{
-    //Llamar vector de aliados
-
-
-    string ordenTurnoAliados = "";
-
-    int  velJ1 = _jugador.getVelocidad();
-    int velM1 = _aliadosM.getVelocidad();
-    int velT1 = _aliadosT.getVelocidad();
-    int velA1 = _aliadosA.getVelocidad();
-    int velS1 = _aliadosS.getVelocidad();
-
-    //jugador
-    if (velJ1 >= velM1)
-    {
-        ordenTurnoAliados = "Juagdor";
-    }
-    else if(velJ1 >= velT1)
-    {
-        ordenTurnoAliados = "Juagdor";
-    }
-    else if (velJ1 >= velA1)
-    {
-        ordenTurnoAliados = "Juagdor";
-    }
-    else if (velJ1 >= velS1)
-    {
-        ordenTurnoAliados = "Juagdor";
-    }//Mago
-    else if (velM1 >= velJ1)
-    {
-        ordenTurnoAliados = "Mago";
-    }
-    else if (velM1 >= velA1)
-    {
-        ordenTurnoAliados = "Mago";
-    }
-    else if (velM1 >= velT1)
-    {
-        ordenTurnoAliados = "Mago";
-    }
-    else if (velM1 >= velS1)
-    {
-        ordenTurnoAliados = "Mago";
-    }//Tanque
-    else if (velT1 >= velJ1)
-    {
-        ordenTurnoAliados = "Tanque";
-    }
-    else if (velT1 >= velA1)
-    {
-        ordenTurnoAliados = "Tanque";
-    }
-    else if (velT1 >= velM1)
-    {
-        ordenTurnoAliados = "Tanque";
-    }
-    else if (velT1 >= velS1)
-    {
-        ordenTurnoAliados = "Tanque";
-    }//Asesino
-    else if (velA1 >= velJ1)
-    {
-        ordenTurnoAliados = "Asesino";
-    }
-    else if (velA1 >= velM1)
-    {
-        ordenTurnoAliados = "Asesino";
-    }
-    else if (velA1 >= velT1)
-    {
-        ordenTurnoAliados = "Asesino";
-    }
-    else if (velA1 >= velS1)
-    {
-        ordenTurnoAliados = "Asesino";
-    }//Support
-    else if (velS1 >= velJ1)
-    {
-        ordenTurnoAliados = "Support";
-    }
-    else if (velS1 >= velA1)
-    {
-        ordenTurnoAliados = "Support";
-    }
-    else if (velS1 >= velT1)
-    {
-        ordenTurnoAliados = "Support";
-    }
-    else if (velS1 >= velM1)
-    {
-        ordenTurnoAliados = "Support";
-    }
-
-    return ordenTurnoAliados;
 
 }
 
@@ -593,7 +1018,6 @@ int main() {
         std::cout << "---- Turno " << ++i << " ----" << std::endl;
 
         string ordenTurno = turnoEquipo();
-        string ordenAliados = turnoAliados(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
 
         jugador.MostrarStats();
         enemigo.MostrarStats();
@@ -601,176 +1025,52 @@ int main() {
 
         if (ordenTurno == "Jugador") 
         {//Turno de los aliados
-            if (ordenAliados == "Jugador") {
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-
-                //Esto era para poder ordenarlos por velocidad cada uno, que tomaran accion en ese orden
                 //jugador
-
-                /*
-                if (ordenAliados == "Mago")
-                {//Mago
-                    
-                    AliadoM.eleccionAliados(AliadoM, enemigo);
-                    if (ordenAliados == "Tanque")
-                    {//Mago-tanque
-                        AliadoT.eleccionAliados(AliadoT, enemigo);
-                        if (ordenAliados == "Asesino")
-                        {
-                            AliadoA.eleccionAliados(AliadoA, enemigo);
-                            AliadoS.eleccionAliados(AliadoS, enemigo);
-                        }
-                        else if (ordenAliados == "Support")
-                        {
-                            AliadoS.eleccionAliados(AliadoS, enemigo);
-                            AliadoA.eleccionAliados(AliadoA, enemigo);
-                        }
-                    }
-                    else if (ordenAliados == "Asesino")
-                    {//Mago_asesino
-                        AliadoA.eleccionAliados(AliadoA, enemigo);
-                        if (ordenAliados == "Tanque")
-                        {
-                            AliadoS.eleccionAliados(AliadoS, enemigo);
-                            AliadoT.eleccionAliados(AliadoT, enemigo);
-                        }
-                        else if (ordenAliados == "Support")
-                        {
-                            AliadoS.eleccionAliados(AliadoS, enemigo);
-                            AliadoT.eleccionAliados(AliadoT, enemigo);
-                        }
-                       
-                    }
-                    else if (ordenAliados == "Support")
-                    {//Mago-support
-                        AliadoS.eleccionAliados(AliadoS, enemigo);
-                        if (ordenAliados == "Tanque")
-                        {
-                            AliadoT.eleccionAliados(AliadoT, enemigo);
-                            AliadoA.eleccionAliados(AliadoA, enemigo);
-                        }
-                        else if (ordenAliados == "Asesino")
-                        {
-                            AliadoA.eleccionAliados(AliadoA, enemigo);
-                            AliadoT.eleccionAliados(AliadoT, enemigo);
-                        }
-
-                    }
-                   
-                }
-                else if (ordenAliados == "Tanque")
-                {//Tanque
-                    AliadoT.eleccionAliados(AliadoT, enemigo);
-                    AliadoA.eleccionAliados(AliadoA, enemigo);
-                    AliadoS.eleccionAliados(AliadoS, enemigo);
-                    AliadoM.eleccionAliados(AliadoM, enemigo);
-                }
-                else if (ordenAliados == "Asesino")
-                {
-                    AliadoS.eleccionAliados(AliadoS, enemigo);
-                    AliadoT.eleccionAliados(AliadoT, enemigo);
-                    AliadoA.eleccionAliados(AliadoA, enemigo);
-                    AliadoM.eleccionAliados(AliadoM, enemigo);
-                }
-                else if (ordenAliados == "Support")
-                {
-                    AliadoS.eleccionAliados(AliadoS, enemigo);
-                    AliadoT.eleccionAliados(AliadoT, enemigo);
-                    AliadoA.eleccionAliados(AliadoA, enemigo);
-                    AliadoM.eleccionAliados(AliadoM, enemigo);
-                }
-                */
-            }
-            else if(ordenAliados == "Mago")
-            {
-                AliadoM.eleccionAliados(AliadoM, enemigo);
                 jugador.eleccionJugador(jugador, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
+                enemigo.MostrarStats();
+                //Mago
+                AliadoM.MostrarStatsAliado(AliadoM);
+                AliadoM.eleccionAliadoMago(AliadoM, enemigo);
+                enemigo.MostrarStats();
+                //Tanque
+                AliadoT.MostrarStatsAliado(AliadoT);
+                AliadoT.eleccionAliadoTanque(AliadoT, enemigo);
+                enemigo.MostrarStats();
+                //Asesino
+                AliadoA.MostrarStatsAliado(AliadoA);
+                AliadoA.eleccionAliadoAsesino(AliadoA, enemigo);
+                enemigo.MostrarStats();
+                //Support
+                AliadoS.MostrarStatsAliado(AliadoS);
+                AliadoS.eleccionAliadoSupport(AliadoS, enemigo);
+                enemigo.MostrarStats();
+                //Enemigo ataca
                 enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-            }
-            else if (ordenAliados == "Tanque")
-            {
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-            }
-            else if (ordenAliados == "Asesnio")
-            {
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-            }
-            else if (ordenAliados == "Support")
-            {
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-            }
 
         }
         else
         {//Turno enemigos
-            if (ordenAliados == "Jugador") {
                 enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
+                //jugador
                 jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-            }
-            else if (ordenAliados == "Mago")
-            {
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-            }
-            else if (ordenAliados == "Tanque")
-            {
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-            }
-            else if (ordenAliados == "Asesnio")
-            {
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-            }
-            else if (ordenAliados == "Support")
-            {
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-                AliadoS.eleccionAliados(AliadoS, enemigo);
-                jugador.eleccionJugador(jugador, enemigo);
-                AliadoM.eleccionAliados(AliadoM, enemigo);
-                AliadoT.eleccionAliados(AliadoT, enemigo);
-                AliadoA.eleccionAliados(AliadoA, enemigo);
-            }
-           
+                enemigo.MostrarStats();
+                //Mago
+                AliadoM.MostrarStatsAliado(AliadoM);
+                AliadoM.eleccionAliadoMago(AliadoM, enemigo);
+                enemigo.MostrarStats();
+                //Tanque
+                AliadoT.MostrarStatsAliado(AliadoT);
+                AliadoT.eleccionAliadoTanque(AliadoT, enemigo);
+                enemigo.MostrarStats();
+                //Asesino
+                AliadoA.MostrarStatsAliado(AliadoA);
+                AliadoA.eleccionAliadoAsesino(AliadoA, enemigo);
+                enemigo.MostrarStats();
+                //Support
+                AliadoS.MostrarStatsAliado(AliadoS);
+                AliadoS.eleccionAliadoSupport(AliadoS, enemigo);
+                enemigo.MostrarStats();
+
         }
         system("pause");
         system("cls");

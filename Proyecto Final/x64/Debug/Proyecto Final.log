@@ -1,4 +1,4 @@
 ﻿  Proyecto Final.cpp
-C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(192,68): warning C4267: 'argumento': conversión de 'size_t' a 'int'; posible pérdida de datos
-C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(577,15): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(199,68): warning C4267: 'argumento': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(976,15): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
   Proyecto Final.vcxproj -> C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\x64\Debug\Proyecto Final.exe
