@@ -24,6 +24,7 @@ protected:
     int defensa;
     int ataque;
     int velocidad;
+    int oroJugador;
 
 public:
     std::string nombre;
@@ -33,6 +34,7 @@ public:
         defensa = AleatorizarEstadisticas(5, 20);
         ataque = AleatorizarEstadisticas(50, 100);
         velocidad = AleatorizarEstadisticas(10, 30);
+        oroJugador = AleatorizarEstadisticas(20, 60);
     }
 
     int AleatorizarEstadisticas(int _minimo, int _maximo) {//Me ayudo mi compañero Jorge
@@ -57,6 +59,8 @@ public:
 
     }
 
+    void mostrarOro();
+
     void habilidades(Enemigo& objetivo);
 
     void eleccionJugador(Personaje& jugador, Enemigo& enemigo);
@@ -74,6 +78,17 @@ public:
 
     int getVelocidad() { return velocidad; }
     std::string getNombre() { return nombre; }
+
+    int getoroJugador()
+    {
+        return oroJugador;
+    }
+
+    int setRestaroroJugador(int paramCantidadoro)
+    {
+        oroJugador -= paramCantidadoro;
+        return oroJugador;
+    }
 
 };
 
@@ -463,38 +478,6 @@ public:
     std::string getNombre() { return nombre; }
 };
 
-class Jugador
-{
-private:
-    string nombreJugador;
-    int oroJugador;
-
-
-
-public:
-    Jugador() //constructor
-    {
-        nombreJugador = "Lonki";   //nombre de el jugador al entrar en la tienda
-        oroJugador = 200;   //cantidad de oro con la que empezamos       
-    }
-    void funcMostrarInfoJugador()
-    {
-        std::cout << "Nombre: " << nombreJugador << endl << "Oro inicial: " << oroJugador << endl;
-    }
-
-    int getoroJugador()
-    {
-        return oroJugador;
-    }
-
-    int setRestaroroJugador(int paramCantidadoro)
-    {
-        oroJugador -= paramCantidadoro;
-        return oroJugador;
-    }
-
-};
-
 //Pocion --> Objeto
 class Pocion
 {
@@ -552,10 +535,11 @@ public:
 
     }
 
-    void funcMostrarMenu()
+    void funcMostrarMenu(Personaje& jugador)
     {
         std::cout << "-----Bienvenido a la tienda de pociones-----" << endl;
         std::cout << "Seleccione un numero del menu" << endl << endl;
+        jugador.mostrarOro();
         for (size_t i = 0; i < listaPociones.size(); i++)// listaPociones.size() (Recorre posiciones del num de vectores)
         {
             std::cout << i + 1 << ".- ";
@@ -565,13 +549,13 @@ public:
 
     }
 
-    int funcComprarPocion(Jugador paramJugador)//parametros de jugador
+    int funcComprarPocion(Personaje paramJugador)//parametros de jugador
     {
         int opcionSeleccionada;
 
         do
         {
-            funcMostrarMenu();
+            funcMostrarMenu(paramJugador);
             std::cout << endl;
             cin >> opcionSeleccionada;
 
@@ -607,6 +591,7 @@ public:
             }
 
                   break;
+
             default:
                 if (listaPociones.size() + 1 == opcionSeleccionada)
                 {
@@ -1198,7 +1183,6 @@ void Personaje::eleccionJugador(Personaje& jugador, Enemigo& enemigo) {
     system("cls");
 }
 
-
 void Personaje::habilidades(Enemigo& objetivo) {
     int opcion;
     int danio;
@@ -1249,6 +1233,11 @@ void Personaje::habilidades(Enemigo& objetivo) {
     } while (opcion < 1 || opcion > 3);  // Solo repite si elige mal
 }
 
+void Personaje::mostrarOro()
+{
+        cout << endl << "Oro inicial: " << oroJugador << endl;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Turnos
 
@@ -1295,7 +1284,77 @@ void desicionCombate()
         std::cout << "Empate. Ambos han caído.\n";
 }
 
+void Combate(Personaje jugador, Aliados _aliadoM, Aliados _aliadoT, Aliados _aliadoA, Aliados _aliadoS, Enemigo _enemigo)
+{
+    bool todosVivos = true;
 
+    int i = 0;
+    do {
+        std::cout << "---- Turno " << ++i << " ----" << std::endl;
+
+        string ordenTurno = turnoEquipo();
+
+        jugador.MostrarStats();
+        _enemigo.MostrarStats();
+
+
+        if (ordenTurno == "Jugador")
+        {//Turno de los aliados
+                //jugador
+            jugador.eleccionJugador(jugador, _enemigo);
+            _enemigo.MostrarStats();
+            //Mago
+            _aliadoM.MostrarStatsAliado(_aliadoM);
+            _aliadoM.eleccionAliadoMago(_aliadoM, _enemigo);
+            _enemigo.MostrarStats();
+            //Tanque
+            _aliadoT.MostrarStatsAliado(_aliadoT);
+            _aliadoT.eleccionAliadoTanque(_aliadoT, _aliadoM, _aliadoA, _aliadoS, jugador, _enemigo);
+            _enemigo.MostrarStats();
+            //Asesino
+            _aliadoA.MostrarStatsAliado(_aliadoA);
+            _aliadoA.eleccionAliadoAsesino(_aliadoA, _enemigo);
+            _enemigo.MostrarStats();
+            //Support
+            _aliadoS.MostrarStatsAliado(_aliadoS);
+            _aliadoS.eleccionAliadoSupport(_aliadoS, _aliadoM, _aliadoT, _aliadoA, jugador, _enemigo);
+            _enemigo.MostrarStats();
+            //Enemigo ataca
+            _enemigo.atacarEnemigo(jugador, _aliadoM, _aliadoT, _aliadoA, _aliadoS);
+
+        }
+        else
+        {//Turno enemigos
+            _enemigo.atacarEnemigo(jugador, _aliadoM, _aliadoT, _aliadoA, _aliadoS);
+            //jugador
+            jugador.eleccionJugador(jugador, _enemigo);
+            _enemigo.MostrarStats();
+            //Mago
+            _aliadoM.MostrarStatsAliado(_aliadoM);
+            _aliadoM.eleccionAliadoMago(_aliadoM, _enemigo);
+            _enemigo.MostrarStats();
+            //Tanque
+            _aliadoT.MostrarStatsAliado(_aliadoT);
+            _aliadoT.eleccionAliadoTanque(_aliadoT, _aliadoM, _aliadoA, _aliadoS, jugador, _enemigo);
+            _enemigo.MostrarStats();
+            //Asesino
+            _aliadoA.MostrarStatsAliado(_aliadoA);
+            _aliadoA.eleccionAliadoAsesino(_aliadoA, _enemigo);
+            _enemigo.MostrarStats();
+            //Support
+            _aliadoS.MostrarStatsAliado(_aliadoS);
+            _aliadoS.eleccionAliadoSupport(_aliadoS, _aliadoM, _aliadoT, _aliadoA, jugador, _enemigo);
+            _enemigo.MostrarStats();
+
+        }
+        system("pause");
+        system("cls");
+        if (jugador.getVida() > 0 && _aliadoM.getVida() > 0 && _aliadoT.getVida() > 0 && _aliadoA.getVida() > 0 && _aliadoS.getVida() > 0) todosVivos = false;
+
+    } while (todosVivos = false && _enemigo.getVida() > 0);
+
+    desicionCombate();
+}
 
 int main() {
 
@@ -1311,76 +1370,11 @@ int main() {
     Personaje jugador;
     Enemigo enemigo;
 
-    bool todosVivos = true;
+    Personaje jugadorObjeto;
 
-    jugador.pedirNombre();
-   
-    int i = 0;
-    do {
-        std::cout << "---- Turno " << ++i << " ----" << std::endl;
-
-        string ordenTurno = turnoEquipo();
-
-        jugador.MostrarStats();
-        enemigo.MostrarStats();
-
-
-        if (ordenTurno == "Jugador") 
-        {//Turno de los aliados
-                //jugador
-                jugador.eleccionJugador(jugador, enemigo);
-                enemigo.MostrarStats();
-                //Mago
-                AliadoM.MostrarStatsAliado(AliadoM);
-                AliadoM.eleccionAliadoMago(AliadoM, enemigo);
-                enemigo.MostrarStats();
-                //Tanque
-                AliadoT.MostrarStatsAliado(AliadoT);
-                AliadoT.eleccionAliadoTanque(AliadoT, AliadoM, AliadoA, AliadoS, jugador, enemigo);
-                enemigo.MostrarStats();
-                //Asesino
-                AliadoA.MostrarStatsAliado(AliadoA);
-                AliadoA.eleccionAliadoAsesino(AliadoA, enemigo);
-                enemigo.MostrarStats();
-                //Support
-                AliadoS.MostrarStatsAliado(AliadoS);
-                AliadoS.eleccionAliadoSupport(AliadoS, AliadoM, AliadoT, AliadoA, jugador, enemigo);
-                enemigo.MostrarStats();
-                //Enemigo ataca
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-
-        }
-        else
-        {//Turno enemigos
-                enemigo.atacarEnemigo(jugador, AliadoM, AliadoT, AliadoA, AliadoS);
-                //jugador
-                jugador.eleccionJugador(jugador, enemigo);
-                enemigo.MostrarStats();
-                //Mago
-                AliadoM.MostrarStatsAliado(AliadoM);
-                AliadoM.eleccionAliadoMago(AliadoM, enemigo);
-                enemigo.MostrarStats();
-                //Tanque
-                AliadoT.MostrarStatsAliado(AliadoT);
-                AliadoT.eleccionAliadoTanque(AliadoT, AliadoM, AliadoA, AliadoS, jugador, enemigo);
-                enemigo.MostrarStats();
-                //Asesino
-                AliadoA.MostrarStatsAliado(AliadoA);
-                AliadoA.eleccionAliadoAsesino(AliadoA, enemigo);
-                enemigo.MostrarStats();
-                //Support
-                AliadoS.MostrarStatsAliado(AliadoS);
-                AliadoS.eleccionAliadoSupport(AliadoS, AliadoM, AliadoT, AliadoA, jugador, enemigo);
-                enemigo.MostrarStats();
-
-        }
-        system("pause");
-        system("cls");
-        if (jugador.getVida() > 0 && AliadoM.getVida() > 0 && AliadoT.getVida() > 0 && AliadoA.getVida() > 0 && AliadoS.getVida() > 0) todosVivos = false;
-
-    } while (todosVivos =false && enemigo.getVida() > 0);
-
-    desicionCombate();
+    Tienda tienda;//Crear objeto tienda
+    tienda.funcComprarPocion(jugadorObjeto);
+    Combate(jugador, AliadoM, AliadoT, AliadoA, AliadoS, enemigo);
 
     return 0;
 }
