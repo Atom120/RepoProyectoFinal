@@ -35,7 +35,7 @@ public:
         defensa = AleatorizarEstadisticas(5, 20);
         ataque = AleatorizarEstadisticas(50, 100);
         velocidad = AleatorizarEstadisticas(10, 30);
-        oroJugador = AleatorizarEstadisticas(50, 60);
+        oroJugador = AleatorizarEstadisticas(500, 600);
     }
 
     int AleatorizarEstadisticas(int _minimo, int _maximo) {//Me ayudo mi compañero Jorge
@@ -71,6 +71,8 @@ public:
     void eleccionJugador(Personaje& jugador, Enemigo& enemigo);
 
     void atacar(Enemigo& objetivo);
+
+    void eliminarPoción(vector<Pocion> _listaObjetos);
 
 
     //Getter y setters
@@ -545,7 +547,8 @@ public:
     void funcMostrarMenu(Personaje& jugador)
     {
         std::cout << "-----Bienvenido a la tienda de pociones-----" << endl;
-        std::cout << "Seleccione un numero del menu" << endl << endl;
+        std::cout << "Seleccione un numero del menu" << endl;
+        std::cout << "En combate solo puedes usar tus primeras tres pociones" << endl << endl;
         jugador.mostrarOro();
         for (size_t i = 0; i < listaPociones.size(); i++)// listaPociones.size() (Recorre posiciones del num de vectores)
         {
@@ -566,6 +569,12 @@ public:
             std::cout << endl;
             cin >> opcionSeleccionada;
 
+
+            if (std::cin.fail()) {
+                std::cout << "Error: La entrada no es un número válido.\n";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
             switch (opcionSeleccionada)
             {
             case 1:
@@ -613,6 +622,8 @@ public:
             }
 
         } while (opcionSeleccionada != listaPociones.size() + 1);
+        system("pause");
+        system("cls");
 
         return 0;
     }
@@ -634,7 +645,7 @@ void Aliados::eleccionAliadoMago(Personaje& jugador, Enemigo& enemigo)
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. Ver pociones\n";
+        std::cout << "3. Ver inventario\n";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -658,8 +669,9 @@ void Aliados::eleccionAliadoMago(Personaje& jugador, Enemigo& enemigo)
                 this->habilidadesMago(enemigo);
                 break;
             case 3:
-                std::cout << "¿Qué quieres usar?\n";
+                std::cout << "Que quieres usar? \n";
                 jugador.mostrarInventario();
+                jugador.eliminarPoción(listaObjetos);
                 break;
             }
 
@@ -678,7 +690,7 @@ void Aliados::eleccionAliadoTanque(Aliados& _aliadoTanque, Aliados& _aliadoMago,
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. Ver pociones\n";
+        std::cout << "3. Ver inventario\n";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -705,6 +717,7 @@ void Aliados::eleccionAliadoTanque(Aliados& _aliadoTanque, Aliados& _aliadoMago,
             case 3:
                 std::cout << "Que quieres usar? \n";
                 jugador.mostrarInventario();
+                jugador.eliminarPoción(listaObjetos);
                 break;
             }
 
@@ -725,7 +738,7 @@ void Aliados::eleccionAliadoAsesino(Personaje& jugador, Aliados& _aliados, Enemi
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. ver pociones\n";
+        std::cout << "3. ver inventario\n";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -751,6 +764,7 @@ void Aliados::eleccionAliadoAsesino(Personaje& jugador, Aliados& _aliados, Enemi
             case 3:
                 std::cout << "Que quieres usar? \n";
                 jugador.mostrarInventario();
+                jugador.eliminarPoción(listaObjetos);
                 break;
             }
 
@@ -771,7 +785,7 @@ void Aliados::eleccionAliadoSupport(Aliados& _aliadoMago, Aliados& _aliadoTanque
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. ver pociones";
+        std::cout << "3. ver inventario";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -797,6 +811,7 @@ void Aliados::eleccionAliadoSupport(Aliados& _aliadoMago, Aliados& _aliadoTanque
             case 3:
                 std::cout << "Que quieres usar? \n";
                 jugador.mostrarInventario();
+                jugador.eliminarPoción(listaObjetos);
                 break;
             }
 
@@ -1155,11 +1170,11 @@ void Personaje::eleccionJugador(Personaje& jugador, Enemigo& enemigo) {
         std::cout << "\n¿Qué desea hacer?\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Habilidad\n";
-        std::cout << "3. Ver pociones\n";
+        std::cout << "3. Ver inventario\n";
         std::cout << "Ingrese su opción: ";
         std::cin >> opcion;
 
-        if (std::cin.fail()) {
+        if (std::cin.fail()) {//Codigo de Asistente Gemini
             std::cin.clear(); // Limpia el error
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Descarta lo ingresado
             std::cout << "\nEntrada inválida. Por favor, ingrese un número entre 1 y 3.\n\n";
@@ -1183,6 +1198,7 @@ void Personaje::eleccionJugador(Personaje& jugador, Enemigo& enemigo) {
         case 3:
             std::cout << "Que quieres usar? \n";
             jugador.mostrarInventario();
+            jugador.eliminarPoción(listaObjetos);
             break;
         }
 
@@ -1295,7 +1311,7 @@ void desicionCombate()
         std::cout << "Empate. Ambos han caído.\n";
 }
 
-void Combate(Personaje jugador, Aliados _aliadoM, Aliados _aliadoT, Aliados _aliadoA, Aliados _aliadoS, Enemigo _enemigo)
+void Combate(Personaje& jugador, Aliados& _aliadoM, Aliados& _aliadoT, Aliados& _aliadoA, Aliados& _aliadoS, Enemigo& _enemigo)
 {
     bool todosVivos = true;
 
@@ -1362,7 +1378,7 @@ void Combate(Personaje jugador, Aliados _aliadoM, Aliados _aliadoT, Aliados _ali
         system("cls");
         if (jugador.getVida() > 0 && _aliadoM.getVida() > 0 && _aliadoT.getVida() > 0 && _aliadoA.getVida() > 0 && _aliadoS.getVida() > 0) todosVivos = false;
 
-    } while (todosVivos = false && _enemigo.getVida() > 0);
+    } while (todosVivos == false && _enemigo.getVida() > 0);
 
     desicionCombate();
 }
@@ -1385,6 +1401,66 @@ void Personaje::mostrarInventario(){
     }
 }
 
+void Personaje::eliminarPoción(vector<Pocion> _listaObjetos)
+{
+    int opcion;
+
+    do {
+        std::cout << "\n¿Qué desea hacer?\n";
+        std::cout << "1.Primera pocion\n";
+        std::cout << "2.Segunda pocion\n";
+        std::cout << "3.Tercera pocion\n";
+        std::cout << "4.Salir\n";
+        std::cout << "Ingrese su opción: ";
+        std::cin >> opcion;
+
+        if (std::cin.fail()) {//Codigo de Asistente Gemini
+            std::cin.clear(); // Limpia el error
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Descarta lo ingresado
+            std::cout << "\nEntrada inválida. Por favor, ingrese un número entre 1 y 3.\n\n";
+            opcion = -1; // Forzar que entre al bucle de nuevo
+            continue;
+        }
+
+       
+
+        if (_listaObjetos.size() > 0)
+        {
+            switch (opcion) {
+
+            case 1:
+                listaObjetos.erase(listaObjetos.begin() );
+                break;
+            case 2:
+                listaObjetos.erase(listaObjetos.begin() + 1);
+                break;
+            case 3:
+                listaObjetos.erase(listaObjetos.begin() + 2);
+                break;
+            case 4:
+                cout << "\n\nSaliendo de la tienda\n";
+                system("pause");
+                break;
+            default:
+                if (opcion < 1 || opcion > 4) {
+                    std::cout << "\n Opción no válida. Intente de nuevo.\n\n";
+                    continue;
+                }
+               break;
+            }
+        }
+        else
+        {
+            cout << "No hay nada en tu inventario\n\n";
+        }
+        system("pause");
+        system("cls");
+
+    } while (opcion < 1 || opcion > 4);
+
+    system("cls");
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1401,8 +1477,11 @@ int main() {
     Aliados AliadoS("Support", 180,220, 50,60, 50,55, 5,30);
     Personaje jugador;
     Enemigo enemigo;
+    
 
     Tienda tienda;//Crear objeto tienda
+
+    jugador.pedirNombre();
     tienda.funcComprarPocion(jugador);
     Combate(jugador, AliadoM, AliadoT, AliadoA, AliadoS, enemigo);
 
