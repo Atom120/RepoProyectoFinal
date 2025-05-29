@@ -20,6 +20,7 @@ class Pocion;
 class Personaje {
 protected:
 
+    int vidaMaxima;
     int vida;
     int defensa;
     int ataque;
@@ -32,6 +33,7 @@ public:
 
     Personaje() {
         vida = AleatorizarEstadisticas(150, 200);
+        vidaMaxima = vida;
         defensa = AleatorizarEstadisticas(5, 20);
         ataque = AleatorizarEstadisticas(50, 100);
         velocidad = AleatorizarEstadisticas(10, 30);
@@ -53,12 +55,21 @@ public:
     void MostrarStats() {
         std::cout << "\n---- Estado actual del jugador ----" << std::endl;
         std::cout << "Nombre: " << nombre << std::endl;
-        std::cout << "Vida: " << vida << std::endl;
+        std::cout << "Vida: " << vida << " / " << vidaMaxima << std::endl;
         std::cout << "Defensa: " << defensa << std::endl;
         std::cout << "Ataque: " << ataque << std::endl;
         std::cout << "Velocidad: " << velocidad << std::endl << std::endl;
-
     }
+
+
+    void sumarVida(int _curacion) {
+        vida += _curacion;
+        if (vida > vidaMaxima) {
+            vida = vidaMaxima;
+        }
+    }
+
+
 
     void mostrarInventario();
 
@@ -72,7 +83,7 @@ public:
 
     void atacar(Enemigo& objetivo);
 
-    void eliminarPoción(vector<Pocion> _listaObjetos);
+    void eliminarPoción(vector<Pocion>& _listaObjetos);
 
 
     //Getter y setters
@@ -195,29 +206,16 @@ private:
 public:
     std::string nombre;
 
-    Enemigo() {
-        vida = AleatorizarEstadisticas(250, 300);
-        defensa = AleatorizarEstadisticas(5, 20);
-        ataque = AleatorizarEstadisticas(50, 55);
-        velocidad = AleatorizarEstadisticas(20, 25);
-
-        nombre = nomEnemigoPosible[rand() % nomEnemigoPosible.size()];
-    }
-
-    Enemigo(int Vmin_, int Vmax_, int Dmin_, int Dmax_, int Amin_, int Amax_) {
+    Enemigo(int Vmin_, int Vmax_, int Dmin_, int Dmax_, int Amin_, int Amax_, int Velmin_, int Velmax_ ) {
         vida = AleatorizarEstadisticas(Vmin_, Vmax_);
         defensa = AleatorizarEstadisticas(Dmin_, Dmax_);
         ataque = AleatorizarEstadisticas(Amin_, Amax_);
+        velocidad = AleatorizarEstadisticas(Velmin_, Velmax_);
+        nombre = nomEnemigoPosible[rand() % nomEnemigoPosible.size()];
     }
 
     int AleatorizarEstadisticas(int _minimo, int _maximo) {
         return _minimo + rand() % (_maximo - _minimo + 1);
-    }
-
-    void pedirNombre() {
-        std::cout << "Ingrese el nombre del peleador" << std::endl;
-        std::cin >> nombre;
-        system("cls");
     }
 
     void MostrarStats() {
@@ -257,7 +255,7 @@ public:
 
         // Si toca atacar a todos
         if (todos) {
-            std::cout << "\n¡" << nombre << " lanza un ataque masivo contra todos los aliados!\n\n";
+            std::cout << "\n¡" << nombre << obtenerNombreAtaqueArea() << "\n\n";
 
             /*Manera panista tradicional
             for (int i = 0; i < Vivos.size(); ++i) {
@@ -307,7 +305,7 @@ public:
 
                 objetivo.setVida(objetivo.getVida() - danio);
 
-                std::cout << nombre << " ataca a " << objetivo.getNombre()
+                std::cout << nombre << " ataca a " << objetivo.getNombre() << " con " << obtenerNombreAtaque()
                     << " causando " << danio << " de daño"
                     << (esCritico ? " ¡CRÍTICO!\n" : "\n");
             }
@@ -329,6 +327,10 @@ public:
                 }
 
                 elegido.setVida(elegido.getVida() - danio);
+
+                std::cout << nombre << " ataca a " << elegido.getNombre() << " con " << obtenerNombreAtaque()
+                    << " causando " << danio << " de daño"
+                    << (esCritico ? " ¡CRÍTICO!\n" : "\n");
 
                 std::cout << nombre << " ataca a " << elegido.getNombre()
                     << " causando " << danio << " de daño"
@@ -477,6 +479,23 @@ public:
         return nombre;
     }
 
+    // Devuelve el nombre del ataque individual según el nombre del enemigo
+    string obtenerNombreAtaque() const {
+        if (nombre == "Esqueleto") return "Golpe Óseo";
+        else if (nombre == "Pepsi") return "Chorro de Gas Carbónico";
+        else if (nombre == "Soda") return "Explosión de Burbujas";
+        else return "Ataque Desconocido";
+    }
+
+    // Devuelve el nombre del ataque en área según el nombre del enemigo
+    string obtenerNombreAtaqueArea() const {
+        if (nombre == "Esqueleto") return "Tormenta de Huesos";
+        else if (nombre == "Pepsi") return "Erupción Gaseosa";
+        else if (nombre == "Soda") return "Burbujeo Explosivo";
+        else return "Ataque en Área Desconocido";
+    }
+
+
     int getVida() { return vida; }
     void setVida(int _vida) { vida = _vida; }
 
@@ -485,13 +504,15 @@ public:
 
     int getVelocidad() { return velocidad; }
     std::string getNombre() { return nombre; }
+
+
 };
 
 //Pocion --> Objeto
 class Pocion
 {
 private:
-    int cantidadPocion;
+    int saludRecuperada;
     int precioPocion;
     int nivelPocion;
     string descripcionEfectoPocion;
@@ -499,9 +520,9 @@ private:
 
 public:
     //Constructor pocion
-    Pocion(int _cantidadPocion, int _precioPocion, int _nivelPocion, string _descripcionEfectoPocion, string _nombrePocion)
+    Pocion(int _saludRecuperada, int _precioPocion, int _nivelPocion, string _descripcionEfectoPocion, string _nombrePocion)
     {
-        cantidadPocion = _cantidadPocion;
+        saludRecuperada = _saludRecuperada;
         precioPocion = _precioPocion;
         nivelPocion = _nivelPocion;
         descripcionEfectoPocion = _descripcionEfectoPocion;
@@ -523,7 +544,10 @@ public:
         return precioPocion;
     }
 
-
+    int getSaludPocion()
+    {
+        return saludRecuperada;
+    }
 };
 
 //Tienda --> objeto
@@ -537,10 +561,10 @@ public:
     Tienda()
     {
         //Constructor pocion(int _cantidadPocion, int _precioPocion, int _nivelPocion, string _descripcionEfectoPocion, string _nombrePocion)
-        listaPociones.push_back(Pocion(3, 50, 2, "Restaura 50 puntos de vida ", "Pocion de vida"));
-        listaPociones.push_back(Pocion(8, 100, 5, "Restaura 40 puntos de mana ", "Pocion de mana"));
-        listaPociones.push_back(Pocion(2, 150, 10, "Restaura 100 puntos de vida ", "Elixir mayor de vida"));
-        listaPociones.push_back(Pocion(5, 200, 15, "Restaura 80 puntos de mana ", "Elixir mayor de mana"));
+        listaPociones.push_back(Pocion(1, 50, 1, "Restaura 50 puntos de vida ", "Pocion de vida"));
+        listaPociones.push_back(Pocion(1, 100, 2, "Restaura 40 puntos de vida ", "Pocion mayor"));
+        listaPociones.push_back(Pocion(1, 150, 3, "Restaura 100 puntos de vida ", "Elixir menor de vida"));
+        listaPociones.push_back(Pocion(1, 200, 4, "Restaura 80 puntos de vida ", "Elixir mayor de vida"));
 
     }
 
@@ -645,7 +669,6 @@ void Aliados::eleccionAliadoMago(Personaje& jugador, Enemigo& enemigo)
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. Ver inventario\n";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -654,7 +677,7 @@ void Aliados::eleccionAliadoMago(Personaje& jugador, Enemigo& enemigo)
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        else if (opcion < 1 || opcion > 3) {
+        else if (opcion < 1 || opcion > 2) {
             std::cout << "Opción fuera de rango. Elige 1, 2 o 3.\n";
         }
         else {
@@ -668,11 +691,7 @@ void Aliados::eleccionAliadoMago(Personaje& jugador, Enemigo& enemigo)
                 std::cout << "Habilidades\n";
                 this->habilidadesMago(enemigo);
                 break;
-            case 3:
-                std::cout << "Que quieres usar? \n";
-                jugador.mostrarInventario();
-                jugador.eliminarPoción(listaObjetos);
-                break;
+
             }
 
             system("pause");
@@ -690,7 +709,6 @@ void Aliados::eleccionAliadoTanque(Aliados& _aliadoTanque, Aliados& _aliadoMago,
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. Ver inventario\n";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -700,7 +718,7 @@ void Aliados::eleccionAliadoTanque(Aliados& _aliadoTanque, Aliados& _aliadoMago,
             std::cin.clear(); // limpia el estado de error
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // limpia el búfer
         }
-        else if (opcion < 1 || opcion > 3) {
+        else if (opcion < 1 || opcion > 2) {
             std::cout << "Opción fuera de rango. Intenta de nuevo.\n";
         }
         else {
@@ -713,11 +731,6 @@ void Aliados::eleccionAliadoTanque(Aliados& _aliadoTanque, Aliados& _aliadoMago,
             case 2:
                 std::cout << "Habilidades:\n";
                 habilidadesTanque(_aliadoMago, _aliadoAsesino, _aliadoSupport, jugador, enemigo);
-                break;
-            case 3:
-                std::cout << "Que quieres usar? \n";
-                jugador.mostrarInventario();
-                jugador.eliminarPoción(listaObjetos);
                 break;
             }
 
@@ -738,7 +751,6 @@ void Aliados::eleccionAliadoAsesino(Personaje& jugador, Aliados& _aliados, Enemi
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. ver inventario\n";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -747,7 +759,7 @@ void Aliados::eleccionAliadoAsesino(Personaje& jugador, Aliados& _aliados, Enemi
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        else if (opcion < 1 || opcion > 3) {
+        else if (opcion < 1 || opcion > 2) {
             std::cout << "Opción fuera de rango. Elige 1, 2 o 3.\n";
         }
         else {
@@ -760,11 +772,6 @@ void Aliados::eleccionAliadoAsesino(Personaje& jugador, Aliados& _aliados, Enemi
             case 2:
                 std::cout << "\nHabilidades \n";
                 habilidadesAsesino(enemigo);
-                break;
-            case 3:
-                std::cout << "Que quieres usar? \n";
-                jugador.mostrarInventario();
-                jugador.eliminarPoción(listaObjetos);
                 break;
             }
 
@@ -785,7 +792,6 @@ void Aliados::eleccionAliadoSupport(Aliados& _aliadoMago, Aliados& _aliadoTanque
         std::cout << "\n--- Elige una acción ---\n";
         std::cout << "1. Atacar\n";
         std::cout << "2. Usar habilidad\n";
-        std::cout << "3. ver inventario";
         std::cout << "Opción: ";
         std::cin >> opcion;
 
@@ -794,7 +800,7 @@ void Aliados::eleccionAliadoSupport(Aliados& _aliadoMago, Aliados& _aliadoTanque
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        else if (opcion < 1 || opcion > 3) {
+        else if (opcion < 1 || opcion > 2) {
             std::cout << "Opción fuera de rango. Elige 1, 2 o 3.\n";
         }
         else {
@@ -807,11 +813,6 @@ void Aliados::eleccionAliadoSupport(Aliados& _aliadoMago, Aliados& _aliadoTanque
             case 2:
                 std::cout << "Habilidades \n";
                 habilidadesSupport(_aliadoMago, _aliadoTanque, _aliadoAsesino, _aliadoSupport, jugador, enemigo);
-                break;
-            case 3:
-                std::cout << "Que quieres usar? \n";
-                jugador.mostrarInventario();
-                jugador.eliminarPoción(listaObjetos);
                 break;
             }
 
@@ -1268,36 +1269,26 @@ void Personaje::mostrarOro()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Turnos
 
-string turnoEquipo()
+string turnoEquipo(Personaje& jugador, Enemigo& enemigo)
 {
-    Personaje jugador;
-    Enemigo enemigo;
-
-    string ordenTurno = "";
+    string ordenTurno;
 
     int velJ1 = jugador.getVelocidad();
     int velJ2 = enemigo.getVelocidad();
 
     if (velJ1 > velJ2)
-    {
         ordenTurno = "Jugador";
-    }
     else
-    {
         ordenTurno = "Enemigo";
-    }
 
     return ordenTurno;
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void desicionCombate()
+void desicionCombate(Personaje& jugador, Enemigo& enemigo)
 {
-
-    Personaje jugador;
-    Enemigo enemigo;
 
     std::cout << "\n\n¡Fin del combate!\n";
 
@@ -1319,7 +1310,7 @@ void Combate(Personaje& jugador, Aliados& _aliadoM, Aliados& _aliadoT, Aliados& 
     do {
         std::cout << "---- Turno " << ++i << " ----" << std::endl;
 
-        string ordenTurno = turnoEquipo();
+        string ordenTurno = turnoEquipo(jugador, _enemigo);
 
         jugador.MostrarStats();
         _enemigo.MostrarStats();
@@ -1380,7 +1371,7 @@ void Combate(Personaje& jugador, Aliados& _aliadoM, Aliados& _aliadoT, Aliados& 
 
     } while (todosVivos == false && _enemigo.getVida() > 0);
 
-    desicionCombate();
+    desicionCombate(jugador, _enemigo);
 }
 
 void Personaje::agregarPocion(Pocion nuevaPocion) {
@@ -1401,64 +1392,70 @@ void Personaje::mostrarInventario(){
     }
 }
 
-void Personaje::eliminarPoción(vector<Pocion> _listaObjetos)
+// Esta función permite al jugador usar una poción de su inventario y eliminarla después de usarla.
+void Personaje::eliminarPoción(vector<Pocion>& _listaObjetos)
 {
     int opcion;
 
     do {
+        // Menú para mostrar opciones al jugador
         std::cout << "\n¿Qué desea hacer?\n";
-        std::cout << "1.Primera pocion\n";
-        std::cout << "2.Segunda pocion\n";
-        std::cout << "3.Tercera pocion\n";
-        std::cout << "4.Salir\n";
+        std::cout << "1. Primera poción\n";
+        std::cout << "2. Segunda poción\n";
+        std::cout << "3. Tercera poción\n";
+        std::cout << "4. Salir\n";
         std::cout << "Ingrese su opción: ";
         std::cin >> opcion;
 
-        if (std::cin.fail()) {//Codigo de Asistente Gemini
-            std::cin.clear(); // Limpia el error
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Descarta lo ingresado
-            std::cout << "\nEntrada inválida. Por favor, ingrese un número entre 1 y 3.\n\n";
-            opcion = -1; // Forzar que entre al bucle de nuevo
+        // Validación de entrada: si el usuario mete un valor no numérico
+        if (std::cin.fail()) {
+            std::cin.clear(); // Limpia el estado de error
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignora la entrada inválida
+            std::cout << "\nEntrada inválida. Por favor, ingrese un número entre 1 y 4.\n\n";
+            opcion = -1; // Se usa -1 para que no entre en ninguna opción válida
             continue;
         }
 
-       
-
-        if (_listaObjetos.size() > 0)
-        {
-            switch (opcion) {
-
-            case 1:
-                listaObjetos.erase(listaObjetos.begin() );
-                break;
-            case 2:
-                listaObjetos.erase(listaObjetos.begin() + 1);
-                break;
-            case 3:
-                listaObjetos.erase(listaObjetos.begin() + 2);
-                break;
-            case 4:
-                cout << "\n\nSaliendo de la tienda\n";
-                system("pause");
-                break;
-            default:
-                if (opcion < 1 || opcion > 4) {
-                    std::cout << "\n Opción no válida. Intente de nuevo.\n\n";
-                    continue;
-                }
-               break;
-            }
+        // Verifica si el inventario está vacío
+        if (_listaObjetos.empty()) {
+            std::cout << "No hay nada en tu inventario\n\n";
+            break; // Sale del menú
         }
-        else
-        {
-            cout << "No hay nada en tu inventario\n\n";
+
+        // Si la opción está entre 1 y 3, y hay suficientes pociones en el vector
+        if (opcion >= 1 && opcion <= 3 && opcion - 1 < _listaObjetos.size()) {
+            // _listaObjetos[opcion - 1] accede a la posición correcta del vector (porque los vectores comienzan desde 0)
+            // Se guarda esa poción seleccionada en una nueva variable tipo Pocion llamada pocionUsada
+            // Esto permite trabajar fácilmente con ella más adelante
+            Pocion pocionUsada = _listaObjetos[opcion - 1];
+
+            // Se obtiene cuánta salud recupera esa poción
+            int curacion = pocionUsada.getSaludPocion();
+
+            // Se aplica la curación al jugador usando el método de la clase Personaje
+            sumarVida(curacion);
+
+            // Muestra al jugador lo que hizo
+            std::cout << "Usaste " << pocionUsada.getNombrePocion()
+                << " y recuperaste " << curacion << " de vida.\n";
+
+            // Borra la poción usada del vector para que ya no esté en el inventario
+            // Se usa (opcion - 1) para acceder al índice correcto
+            _listaObjetos.erase(_listaObjetos.begin() + (opcion - 1));
         }
-        system("pause");
-        system("cls");
+        // Si elige 4, simplemente sale del menú
+        else if (opcion == 4) {
+            std::cout << "\nSaliendo del menú de pociones\n";
+        }
+        // Si elige otra opción inválida
+        else {
+            std::cout << "\nOpción no válida. Intente de nuevo.\n\n";
+        }
 
-    } while (opcion < 1 || opcion > 4);
+        system("pause"); // Pausa para que el jugador vea lo que pasó
+        system("cls");   // Limpia la consola
 
-    system("cls");
+    } while (opcion != 4); // Repite el menú hasta que el usuario decida salir
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1476,7 +1473,7 @@ int main() {
     Aliados AliadoA("Asesino", 180,220, 50,60, 50,55, 5,30);
     Aliados AliadoS("Support", 180,220, 50,60, 50,55, 5,30);
     Personaje jugador;
-    Enemigo enemigo;
+    Enemigo enemigo(100,200,25,50,200,250,5,15);
     
 
     Tienda tienda;//Crear objeto tienda
