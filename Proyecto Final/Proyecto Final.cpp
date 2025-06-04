@@ -1477,6 +1477,24 @@ int main() {
     
 
     Tienda tienda;//Crear objeto tienda
+    cout << "────────────────────────────────────────────\n";
+    cout << "EL SILENCIO DEL THÉLUN\n";
+    cout << "────────────────────────────────────────────\n";
+
+    cout << "Dicen que antes del último sol, hubo un grito...\n";
+    cout << "pero nadie lo escuchó.\n";
+
+    cout << "El mundo ha cambiado.Las tierras se agrietan bajo el peso de secretos antiguos, y el Thélun —una energía viva, caótica y misteriosa— ha despertado de su letargo.\n";
+
+    cout << "No todos sobreviven al susurro del Thélun.Algunos pierden la cordura.Otros ganan poder… pero a un precio.";
+
+    cout << "Eres uno de los pocos que aún resiste.No estás solo.A tu lado, un grupo de aliados lucha por mantenerse cuerdos, fuertes... y humanos.Del otro lado, criaturas deformadas por el descontrol te acechan, guiadas por algo que ni siquiera entienden.\n";
+
+    cout << "No hay marcha atrás.Cada decisión importa.Cada combate acerca la verdad.\n";
+
+    cout << "Prepárate.La historia comienza ahora...\n";
+
+    cout << "Presiona cualquier tecla para continuar...\n";
 
     jugador.pedirNombre();
     tienda.funcComprarPocion(jugador);
