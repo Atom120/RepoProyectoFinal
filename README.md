@@ -4,7 +4,7 @@ Es un juego por turnos donde cada personaje debe tomar una desicion por turno, e
 
 Como ejecutar:
 Copiar el archivo raw, entrar a visual studio. crear una proyecto de aplicacion de consola de C++, pegar el codigo y correr el compilador.
-Archivo: Proyecto Final ->
+Archivo: Proyecto Final -> Proyecto Final.cpp
 
 Intrucciones:
 La manera de jugarlo es seleccionar alguna de las opciones disponibles para poder seguir avanzando en la historia y en el juego. 
