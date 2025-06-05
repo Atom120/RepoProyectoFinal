@@ -1,5 +1,5 @@
 ﻿  Proyecto Final.cpp
-C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(890,15): warning C4552: "*": el resultado de la expresión no se usa
-C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(1208,15): warning C4552: "*": el resultado de la expresión no se usa
-C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(1525,15): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(892,15): warning C4552: "*": el resultado de la expresión no se usa
+C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(1215,15): warning C4552: "*": el resultado de la expresión no se usa
+C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\Proyecto Final\Proyecto Final.cpp(1532,15): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
   Proyecto Final.vcxproj -> C:\Users\Cleve\OneDrive\Escritorio\no borrar pls\POO\RepoProycetoFinal\x64\Debug\Proyecto Final.exe

@@ -15,7 +15,7 @@ using namespace std;
 
 // --- Declaración adelantada necesaria ---
 class Enemigo;
-class Aliados;  // 👈 Esto le dice al compilador que Aliados existirá
+class Aliados;  // Esto le dice al compilador que Aliados existirá
 class Pocion;
 
 class Personaje {
@@ -905,8 +905,8 @@ void Aliados::atacarAliados(Enemigo& objetivo)
 void Aliados::habilidadesMago(Enemigo& objetivo)
 {
     int opcion;
-    int danioBase = ataque - objetivo.getDefensa();
-    if (danioBase < 0) danioBase = 0;
+    int danioBase = ataque - objetivo.getDefensa();  // Calcula el daño base restando defensa al ataque
+    if (danioBase < 0) danioBase = 0;  // Asegura que el daño no sea negativo
 
     do {
         cout << "\n¿Qué habilidad quiere usar el Mago?\n";
@@ -914,28 +914,33 @@ void Aliados::habilidadesMago(Enemigo& objetivo)
         cout << "2. Bola de fuego estelar\n";
         cout << "3. Chanclazo\n";
         cout << "Opción: ";
-        cin >> opcion;
 
-        if (cin.fail()) {
-            cin.clear(); // Limpia el estado de error
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Descarta entrada incorrecta
-            cout << " Entrada inválida. Por favor ingrese un número del 1 al 3.\n";
-            opcion = -1; // Fuerza a repetir el bucle
-            continue;
+        string entrada;      // Creamos una cadena para leer la entrada como texto
+        cin >> entrada;      // Leemos entrada del usuario
+
+        try {
+            opcion = stoi(entrada); // Intenta convertir la cadena a número entero (string to int)
+        }
+        catch (...) {
+            // Si stoi falla (porque la entrada no es un número), se ejecuta esto
+            cout << "Entrada inválida. Por favor ingrese un número del 1 al 3.\n";
+            opcion = -1;     // Valor inválido para forzar repetir el bucle
+            continue;        // Salta el resto del bucle y lo reinicia
         }
 
         switch (opcion)
         {
         case 1: {
-            int danioMagico = static_cast<int>(danioBase * 1.5);
-            objetivo.setVida(objetivo.getVida() - danioMagico);
+            // Cálculo del daño mágico: daño base multiplicado por 1.5, convertido a int
+            int danioMagico = static_cast<int>(danioBase * 1.5); // static_cast convierte double → int
+            objetivo.setVida(objetivo.getVida() - danioMagico);  // Resta el daño a la vida del enemigo
             cout << "¡Se lanza el hechizo Destructor atómico de los reyes del inframundo interpolados sin fines de lucro!\n";
             cout << objetivo.getNombre() << " recibe " << danioMagico << " de daño mágico.\n";
             break;
         }
 
         case 2: {
-            int danioMagico = static_cast<int>(danioBase * 1.7);
+            int danioMagico = static_cast<int>(danioBase * 1.7);  // Multiplica el daño base por 1.7
             objetivo.setVida(objetivo.getVida() - danioMagico);
             cout << "¡Bola de fuego estelar lanzada!\n";
             cout << objetivo.getNombre() << " recibe " << danioMagico << " de daño mágico.\n";
@@ -943,7 +948,7 @@ void Aliados::habilidadesMago(Enemigo& objetivo)
         }
 
         case 3: {
-            int danioMagico = danioBase * 2;
+            int danioMagico = danioBase * 2; // Multiplica por 2 sin conversión porque ya es int
             objetivo.setVida(objetivo.getVida() - danioMagico);
             cout << "¡Chanclazo infernal ejecutado!\n";
             cout << objetivo.getNombre() << " recibe " << danioMagico << " de daño mágico.\n";
@@ -951,18 +956,18 @@ void Aliados::habilidadesMago(Enemigo& objetivo)
         }
 
         default:
+            // Si la opción no es válida (ej: 4, 99, etc.), informa al usuario
             cout << "Opción no válida. Intente nuevamente.\n";
             break;
         }
 
-    } while (opcion < 1 || opcion > 3);
+    } while (opcion < 1 || opcion > 3); // Repite hasta que elija una opción válida
 }
-
 void Aliados::habilidadesTanque(Aliados& _aliadoMago, Aliados& _aliadoAsesino, Aliados& _aliadoSupport, Personaje& jugador, Enemigo& objetivo)
 {
     int opcion;
 
-    // Menú con validación de entrada
+    // Bucle para mostrar menú y validar entrada del usuario
     do {
         cout << "¿Qué habilidad quiere usar?\n";
         cout << "1. Ataque escudo paladín (Daño bajo)\n";
@@ -971,11 +976,11 @@ void Aliados::habilidadesTanque(Aliados& _aliadoMago, Aliados& _aliadoAsesino, A
         cout << "\nSeleccione una opción: ";
         cin >> opcion;
 
-        if (cin.fail()) {
+        if (cin.fail()) { // Si se ingresa algo que no es un número
             cin.clear(); // Limpia el estado de error
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Descarta entrada inválida
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Descarta el resto de la entrada
             cout << "Entrada inválida. Por favor ingrese un número del 1 al 3.\n\n";
-            opcion = -1; // Fuerza a repetir el bucle
+            opcion = -1; // Fuerza a repetir el menú
             continue;
         }
 
@@ -983,15 +988,14 @@ void Aliados::habilidadesTanque(Aliados& _aliadoMago, Aliados& _aliadoAsesino, A
             cout << "\nOpción inválida. Intente de nuevo.\n\n";
         }
 
-    } while (opcion < 1 || opcion > 3);  // Solo repite si la opción es inválida
+    } while (opcion < 1 || opcion > 3);  // Repite mientras la opción no esté entre 1 y 3
 
-    // Ejecución de la habilidad elegida
+    // Se ejecuta la habilidad según la opción seleccionada
     switch (opcion)
     {
     case 1: {
-        // Daño aleatorio entre 25 y 45
-        int golpe = AleatorizarEstadisticas(25, 45);  
-        objetivo.setVida(objetivo.getVida() - golpe);
+        int golpe = AleatorizarEstadisticas(25, 45);  // Daño aleatorio
+        objetivo.setVida(objetivo.getVida() - golpe); // Aplica daño
 
         cout << "\nEl tanque invoca su escudo y embiste al enemigo con fuerza brutal...\n";
         cout << nombre << " golpea con su escudo causando: " << golpe << " de daño a " << objetivo.getNombre() << "!\n";
@@ -999,10 +1003,9 @@ void Aliados::habilidadesTanque(Aliados& _aliadoMago, Aliados& _aliadoAsesino, A
     }
 
     case 2: {
-        // Reducción de defensa aleatoria entre 1 y 15
-        int reduccion = AleatorizarEstadisticas(1, 15);
+        int reduccion = AleatorizarEstadisticas(1, 15); // Reducción aleatoria
         int nuevaDefensa = objetivo.getDefensa() - reduccion;
-        if (nuevaDefensa < 0) nuevaDefensa = 0;
+        if (nuevaDefensa < 0) nuevaDefensa = 0; // No permitir defensa negativa
 
         objetivo.setDefensa(nuevaDefensa);
 
@@ -1012,9 +1015,9 @@ void Aliados::habilidadesTanque(Aliados& _aliadoMago, Aliados& _aliadoAsesino, A
     }
 
     case 3: {
-        // Aumento de defensa aleatorio entre 1 y 15 para todos
-        int defensaAumentada = AleatorizarEstadisticas(1, 15);
+        int defensaAumentada = AleatorizarEstadisticas(1, 15); // Buff de defensa
 
+        // Se aplica a todos los aliados y al jugador
         _aliadoAsesino.setDefensa(_aliadoAsesino.getDefensa() + defensaAumentada);
         _aliadoMago.setDefensa(_aliadoMago.getDefensa() + defensaAumentada);
         _aliadoSupport.setDefensa(_aliadoSupport.getDefensa() + defensaAumentada);
@@ -1030,12 +1033,12 @@ void Aliados::habilidadesTanque(Aliados& _aliadoMago, Aliados& _aliadoAsesino, A
         break;
     }
 }
-
 void Aliados::habilidadesAsesino(Enemigo& objetivo)
 {
-    int velA = velocidad;
+    int velA = velocidad; // Copia la velocidad actual del Asesino
     int opcion;
 
+    // Menú con validación
     do {
         cout << "\n¿Qué habilidad quiere usar el Asesino?\n";
         cout << "1. Golpe Sombrío (Alto daño crítico)\n";
@@ -1045,10 +1048,10 @@ void Aliados::habilidadesAsesino(Enemigo& objetivo)
         cin >> opcion;
 
         if (cin.fail()) {
-            cin.clear(); // Limpia el error de entrada
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Descarta entrada inválida
+            cin.clear(); // Limpia error de cin
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpia la entrada incorrecta
             cout << " Entrada inválida. Por favor, ingrese un número entre 1 y 3.\n\n";
-            opcion = -1;
+            opcion = -1; // Repite
             continue;
         }
 
@@ -1063,9 +1066,10 @@ void Aliados::habilidadesAsesino(Enemigo& objetivo)
     case 1:
     {
         bool critico;
-        int danio = calcularDanioConCritico(60, 80, 60, critico);
-        danio = static_cast<int>(danio * 1.5);
-        objetivo.setVida(objetivo.getVida() - danio);
+        int danio = calcularDanioConCritico(60, 80, 60, critico); // daño base + probabilidad
+        danio = static_cast<int>(danio * 1.5); // Multiplica por 1.5
+
+        objetivo.setVida(objetivo.getVida() - danio); // Aplica daño
 
         cout << (critico ? " ¡Asesino realiza un GOLPE PODEROSÍSIMO!\n" : "💥 Asesino realiza un golpe poderoso.\n");
         cout << "Daño total: " << danio << "\n";
@@ -1079,7 +1083,7 @@ void Aliados::habilidadesAsesino(Enemigo& objetivo)
         int golpe2 = calcularDanioConCritico(20, 80, 90, critico2);
         int danioTotal = golpe1 + golpe2;
 
-        objetivo.setVida(objetivo.getVida() - danioTotal);
+        objetivo.setVida(objetivo.getVida() - danioTotal); // Aplica daño
 
         cout << " El Asesino realiza un Doble Corte!\n";
         cout << "Corte 1: " << golpe1 << (critico1 ? " (CRÍTICO)\n" : "\n");
@@ -1090,9 +1094,9 @@ void Aliados::habilidadesAsesino(Enemigo& objetivo)
 
     case 3:
     {
-        int aumento = AleatorizarEstadisticas(1, 10);
-        velA += aumento;
-        velocidad = velA;
+        int aumento = AleatorizarEstadisticas(1, 10); // Buff de velocidad
+        velA += aumento;  // Modifica copia local
+        velocidad = velA; // Asigna al atributo real
 
         cout << " El Asesino se desvanece entre las sombras...\n";
         cout << " ¡Su velocidad aumenta en " << aumento << " puntos!\n";
@@ -1105,15 +1109,15 @@ void Aliados::habilidadesAsesino(Enemigo& objetivo)
         break;
     }
 }
-
 void Aliados::habilidadesSupport(Aliados& _aliadoMago, Aliados& _aliadoAsesino, Aliados& _aliadoTanque, Aliados& _aliadoSupport, Personaje& jugador, Enemigo& objetivo)
 {
     int opcion;
-    int danio = ataque - objetivo.getDefensa();
+    int danio = ataque - objetivo.getDefensa(); // Daño base (aunque no se usa aquí realmente)
     if (danio < 0) danio = 0;
 
     bool entradaValida = false;
 
+    // Menú con validación
     do
     {
         std::cout << "\n¿Qué habilidad quiere usar el Support?\n";
@@ -1124,8 +1128,8 @@ void Aliados::habilidadesSupport(Aliados& _aliadoMago, Aliados& _aliadoAsesino, 
         std::cin >> opcion;
 
         if (std::cin.fail()) {
-            std::cin.clear(); // Limpia el error
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Descarta entrada inválida
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << " Entrada inválida. Por favor, ingrese un número entre 1 y 3.\n";
             continue;
         }
@@ -1161,8 +1165,9 @@ void Aliados::habilidadesSupport(Aliados& _aliadoMago, Aliados& _aliadoAsesino, 
 
         case 2:
         {
-            int healingVida = AleatorizarEstadisticas(30, 55);
+            int healingVida = AleatorizarEstadisticas(30, 55); // Curación aleatoria
 
+            // Cura a aliados + jugador
             _aliadoAsesino.setVida(_aliadoAsesino.getVida() + healingVida);
             _aliadoMago.setVida(_aliadoMago.getVida() + healingVida);
             _aliadoSupport.setVida(_aliadoSupport.getVida() + healingVida);
@@ -1175,7 +1180,7 @@ void Aliados::habilidadesSupport(Aliados& _aliadoMago, Aliados& _aliadoAsesino, 
 
         case 3:
         {
-            int buffAtaque = AleatorizarEstadisticas(5, 15);
+            int buffAtaque = AleatorizarEstadisticas(5, 15); // Buff de ataque
 
             _aliadoAsesino.setAtaque(_aliadoAsesino.getAtaque() + buffAtaque);
             _aliadoMago.setAtaque(_aliadoMago.getAtaque() + buffAtaque);
@@ -1548,6 +1553,8 @@ int main() {
     int desicionVender;
 
     Tienda tienda;//Crear objeto tienda
+    system("color 70");// https://youtu.be/HVFDcLy7hXw?si=_Q1obJ3mZrMbmbve 05/06/2025
+
     cout << "────────────────────────────────────────────\n";
     cout << "EL SILENCIO DEL THÉLUN\n";
     cout << "────────────────────────────────────────────\n";
